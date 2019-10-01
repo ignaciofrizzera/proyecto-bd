@@ -1,9 +1,13 @@
 package gui;
 
+import logica.Logica;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
+import java.util.Collections;
 
 public class GUI{
     private JButton adminButton;
@@ -22,10 +26,11 @@ public class GUI{
     private JTextField monthText;
     private JTable table1;
     private JList tablesList;
-
+    private Logica logica;
 
     public GUI(){
         GUI myGUI = this;
+        logica = new Logica();
 
 
         adminButton.addActionListener(new ActionListener() {
@@ -103,8 +108,8 @@ public class GUI{
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
-        String[] tablas = logica.get_tablas().toArray();
-        tablesList = new JList();
+        String[] tablas = (String[]) logica.get_tablas().toArray();
+        tablesList = new JList(tablas);
     }
 }
 
