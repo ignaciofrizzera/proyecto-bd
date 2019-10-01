@@ -85,11 +85,11 @@ INSERT INTO instancias_vuelo(vuelo, fecha, dia, estado) VALUES("0005", "2020/02/
 
 
 #INSERCION EN EMPLEADOS
-INSERT INTO empleados(legajo, password, doc_tipo, doc_nro, apellido, nombre, direccion, telefono) VALUES(117815, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Tarjeta", 1001, "Gomez", "Juan", "Suarez 100", "466061");
-INSERT INTO empleados(legajo, password, doc_tipo, doc_nro, apellido, nombre, direccion, telefono) VALUES(117825, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Tarjeta", 1002, "Perez", "Cruz", "Brandsen 101", "447819");
-INSERT INTO empleados(legajo, password, doc_tipo, doc_nro, apellido, nombre, direccion, telefono) VALUES(117885, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Libreta", 1003, "Garcia", "Blas", "Alem 98", "445678");
-INSERT INTO empleados(legajo, password, doc_tipo, doc_nro, apellido, nombre, direccion, telefono) VALUES(117889, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Tarjeta", 1004, "Perez", "Pablo", "Colon 1", "901234");
-INSERT INTO empleados(legajo, password, doc_tipo, doc_nro, apellido, nombre, direccion, telefono) VALUES(117890, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Tarjeta", 1005, "Alem", "Ciro", "Colon 95", "121212");
+INSERT INTO empleados(legajo, password, doc_tipo, doc_nro, apellido, nombre, direccion, telefono) VALUES(117815, md5("hola123"), "Tarjeta", 1001, "Gomez", "Juan", "Suarez 100", "466061");
+INSERT INTO empleados(legajo, password, doc_tipo, doc_nro, apellido, nombre, direccion, telefono) VALUES(117825, md5("1234567890"), "Tarjeta", 1002, "Perez", "Cruz", "Brandsen 101", "447819");
+INSERT INTO empleados(legajo, password, doc_tipo, doc_nro, apellido, nombre, direccion, telefono) VALUES(117885, md5("blasgarcia1"), "Libreta", 1003, "Garcia", "Blas", "Alem 98", "445678");
+INSERT INTO empleados(legajo, password, doc_tipo, doc_nro, apellido, nombre, direccion, telefono) VALUES(117889, md5("pabloclon2"), "Tarjeta", 1004, "Perez", "Pablo", "Colon 1", "901234");
+INSERT INTO empleados(legajo, password, doc_tipo, doc_nro, apellido, nombre, direccion, telefono) VALUES(117890, md5("abcdef1234"), "Tarjeta", 1005, "Alem", "Ciro", "Colon 95", "121212");
 
 
 #INSERCION EN PASAJEROS
