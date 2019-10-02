@@ -6,7 +6,9 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 public class GUI {
@@ -65,7 +67,13 @@ public class GUI {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 String query = textSQL.getText();
-                logica.recibir_query(query);
+                try {
+                    Collection<Collection<String>> resultado = logica.recibir_query(query);
+                    updateTable(resultado);
+                } catch (SQLException e) {
+                    showSQLError(e.getMessage());
+                }
+
             }
         });
 
@@ -95,6 +103,30 @@ public class GUI {
                 }
             }
         });
+    }
+    private void showSQLError(String msg){
+        DialogError dialog = new DialogError(msg);
+        dialog.pack();
+        dialog.setVisible(true);
+
+    }
+
+    private void updateTable(Collection<Collection<String>> result){
+        valuesTableModel.setColumnCount(0);
+        valuesTableModel.setRowCount(0);
+
+        Iterator<Collection<String>> iterator = result.iterator();
+        Collection<String> columns = iterator.next();
+
+        for (String column:columns){
+            valuesTableModel.addColumn(column);
+        }
+
+        while (iterator.hasNext()){
+            Collection<String> rowAux = iterator.next();
+            Object[] row = rowAux.toArray();
+            valuesTableModel.addRow(row);
+        }
     }
 
     /**
