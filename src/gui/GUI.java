@@ -1,5 +1,6 @@
 package gui;
 
+import fechas.Fechas;
 import logica.Logica;
 
 import javax.swing.*;
@@ -17,7 +18,7 @@ public class GUI {
     private JPanel mainPanel;
     private JTextArea textSQL;
     private JTable valuesTable;
-    private JPanel panelAdmin;
+    private javax.swing.JPanel panelAdmin;
     private JPanel panelUser;
     private JLabel ciudadOrigen;
     private JComboBox origenComboBox;
@@ -27,16 +28,19 @@ public class GUI {
     private JTextField diaIdaText;
     private JTextField mesIdaText;
     private JTable tablaViajesDisponibles;
-    private JList tablesList;
+    private JList<String> tablesList;
     private JButton consultarButton;
-    private JList atributeList;
+    private JList<String> atributeList;
     private JPanel panelFechaIda;
     private JPanel panelFechaVuelta;
     private JTextField añoIdaText;
     private JTextField diaVueltaText;
     private JTextField mesVueltaText;
     private JTextField añoVueltaText;
-    private DefaultListModel tablesListModel, atributeListModel;
+    private JPanel panelCiudades;
+    private JButton buscarVuelosButton;
+    private DefaultListModel<String> tablesListModel;
+    private DefaultListModel<String> atributeListModel;
     private DefaultTableModel valuesTableModel;
     private Logica logica;
 
@@ -69,9 +73,9 @@ public class GUI {
                 String query = textSQL.getText();
                 try {
                     Collection<Collection<String>> resultado = logica.recibir_query(query);
-                    updateTable(resultado);
+                    updateTableSQL(resultado);
                 } catch (SQLException e) {
-                    showSQLError(e.getMessage());
+                    showError(e.getMessage());
                 }
 
             }
@@ -80,7 +84,7 @@ public class GUI {
         tablesList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
-                String selectedTable = (String) tablesList.getSelectedValue();
+                String selectedTable = tablesList.getSelectedValue();
 
                 atributeListModel.removeAllElements();
                 atributeListModel.addAll(logica.get_atributos(selectedTable));
@@ -103,29 +107,83 @@ public class GUI {
                 }
             }
         });
+        buscarVuelosButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                buscarVuelos();
+            }
+        });
     }
-    private void showSQLError(String msg){
+
+    private void buscarVuelos() {
+        String ciudadOrigen,
+                ciudadDestino,
+                diaIda,
+                mesIda,
+                añoIda,
+                diaVuelta,
+                mesVuelta,
+                añoVuelta,
+                fechaIda,
+                fechaVuelta;
+
+        ciudadOrigen = (String) origenComboBox.getSelectedItem();
+        ciudadDestino = (String) destinoComboBox.getSelectedItem();
+        diaIda = diaIdaText.getText();
+        mesIda = mesIdaText.getText();
+        añoIda = añoIdaText.getText();
+
+        fechaIda = diaIda+"/"+mesIda+"/"+añoIda;
+
+        if (!Fechas.validar(fechaIda)){
+            showError("Fecha de ida invalida.");
+            return;
+        }
+
+
+            // llamar a buscar los vuelos que matcheen con la ida
+
+        if (idaVueltaCheckBox.isSelected()){
+            diaVuelta = diaVueltaText.getText();
+            mesVuelta = mesVueltaText.getText();
+            añoVuelta = añoVueltaText.getText();
+
+            fechaVuelta = diaVuelta+"/"+mesVuelta+"/"+añoVuelta;
+
+            if(!Fechas.validar(fechaVuelta)){
+                showError("Fecha de vuelta invalida.");
+                return;
+            }
+            // llamar a buscar los vuelos que matcheen con la vuelta
+        }
+    }
+
+
+    private void showError(String msg) {
         DialogError dialog = new DialogError(msg);
         dialog.pack();
         dialog.setVisible(true);
 
     }
 
-    private void updateTable(Collection<Collection<String>> result){
+    private void updateTableSQL(Collection<Collection<String>> result) {
         valuesTableModel.setColumnCount(0);
         valuesTableModel.setRowCount(0);
 
         Iterator<Collection<String>> iterator = result.iterator();
-        Collection<String> columns = iterator.next();
 
-        for (String column:columns){
-            valuesTableModel.addColumn(column);
-        }
+        if (iterator.hasNext()) {
+            Collection<String> columns = iterator.next();
 
-        while (iterator.hasNext()){
-            Collection<String> rowAux = iterator.next();
-            Object[] row = rowAux.toArray();
-            valuesTableModel.addRow(row);
+            for (String column : columns) {
+                valuesTableModel.addColumn(column);
+            }
+
+            while (iterator.hasNext()) {
+                Collection<String> rowAux = iterator.next();
+                Object[] row = rowAux.toArray();
+                valuesTableModel.addRow(row);
+            }
         }
     }
 
@@ -190,11 +248,11 @@ public class GUI {
 
 
     private void createUIComponents() {
-        tablesListModel = new DefaultListModel();
-        tablesList = new JList(tablesListModel);
+        tablesListModel = new DefaultListModel<String>();
+        tablesList = new JList<String>(tablesListModel);
 
-        atributeListModel = new DefaultListModel();
-        atributeList = new JList(atributeListModel);
+        atributeListModel = new DefaultListModel<>();
+        atributeList = new JList<String>(atributeListModel);
 
         valuesTableModel = new DefaultTableModel();
         valuesTable = new JTable(valuesTableModel);
