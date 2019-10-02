@@ -3,11 +3,11 @@ package gui;
 import logica.Logica;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.LinkedList;
 
 public class GUI {
     private JButton adminButton;
@@ -18,16 +18,24 @@ public class GUI {
     private JPanel panelAdmin;
     private JPanel panelUser;
     private JLabel ciudadOrigen;
-    private JComboBox comboBox1;
+    private JComboBox origenComboBox;
     private JLabel ciudadDestino;
-    private JComboBox comboBox2;
-    private JCheckBox checkBox1;
-    private JTextField dayText;
-    private JTextField monthText;
-    private JTable table1;
+    private JComboBox destinoComboBox;
+    private JCheckBox idaVueltaCheckBox;
+    private JTextField diaIdaText;
+    private JTextField mesIdaText;
+    private JTable tablaViajesDisponibles;
     private JList tablesList;
     private JButton consultarButton;
-    private DefaultListModel tablesModel;
+    private JList atributeList;
+    private JPanel panelFechaIda;
+    private JPanel panelFechaVuelta;
+    private JTextField añoIdaText;
+    private JTextField diaVueltaText;
+    private JTextField mesVueltaText;
+    private JTextField añoVueltaText;
+    private DefaultListModel tablesListModel, atributeListModel;
+    private DefaultTableModel valuesTableModel;
     private Logica logica;
 
     public GUI() {
@@ -57,8 +65,34 @@ public class GUI {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 String query = textSQL.getText();
-
                 logica.recibir_query(query);
+            }
+        });
+
+        tablesList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                String selectedTable = (String) tablesList.getSelectedValue();
+
+                atributeListModel.removeAllElements();
+                atributeListModel.addAll(logica.get_atributos(selectedTable));
+
+            }
+        });
+        idaVueltaCheckBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (idaVueltaCheckBox.isSelected()) {
+                    cambiarEstado(true);
+                } else {
+                    cambiarEstado(false);
+                }
+            }
+
+            private void cambiarEstado(boolean cambio) {
+                for (Component c : panelFechaVuelta.getComponents()) {
+                    c.setEnabled(cambio);
+                }
             }
         });
     }
@@ -81,8 +115,8 @@ public class GUI {
      * @param password Password del empleado.
      * @return true si pudo conectar, false en caso contrario.
      */
-    public boolean connectEmpleado(int legajo, char[] password) {
-        return connectEmpleado(legajo, password);
+    public boolean connectEmpleado(String legajo, char[] password) {
+        return logica.conectar_empleado(legajo, password);
     }
 
     public void showAdmin() {
@@ -92,8 +126,8 @@ public class GUI {
 
         Collection<String> tablas = logica.get_tablas();
 
-        for(String tabla: tablas){
-            tablesModel.addElement(tabla);
+        for (String tabla : tablas) {
+            tablesListModel.addElement(tabla);
         }
     }
 
@@ -101,6 +135,8 @@ public class GUI {
         userButton.setVisible(false);
         adminButton.setVisible(false);
         panelUser.setVisible(true);
+
+        Collection<Collection<String>> c1 = new LinkedList<>();
     }
 
     public static void main(String[] args) {
@@ -122,9 +158,16 @@ public class GUI {
 
 
     private void createUIComponents() {
-        tablesModel = new DefaultListModel();
-        tablesList = new JList(tablesModel);
+        tablesListModel = new DefaultListModel();
+        tablesList = new JList(tablesListModel);
 
+        atributeListModel = new DefaultListModel();
+        atributeList = new JList(atributeListModel);
+
+        valuesTableModel = new DefaultTableModel();
+        valuesTable = new JTable(valuesTableModel);
+        valuesTableModel.setRowCount(0);
+        valuesTableModel.setColumnCount(0);
     }
 }
 

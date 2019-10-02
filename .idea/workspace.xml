@@ -2,13 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="14173f68-788c-4ae7-993c-3875f2bd7270" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/proyecto-bd/gui/GUI$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/proyecto-bd/gui/GUI$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/proyecto-bd/gui/GUI$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/proyecto-bd/gui/GUI$2.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/proyecto-bd/gui/GUI$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/proyecto-bd/gui/GUI$3.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/proyecto-bd/gui/GUI.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/proyecto-bd/gui/GUI.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proyecto-bd.iml" beforeDir="false" afterPath="$PROJECT_DIR$/proyecto-bd.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/DialogUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/DialogUser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/GUI.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/GUI.form" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/GUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/GUI.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/logica/Logica.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/logica/Logica.java" afterDir="false" />
@@ -37,13 +36,16 @@
   </component>
   <component name="ProjectId" id="1RcimRrw9vYsV7z2U1HhdoZhtES" />
   <component name="PropertiesComponent">
+    <property name="UI_DESIGNER_EDITOR_MODE.PaletteManager.SHOW" value="true" />
     <property name="UI_DESIGNER_EDITOR_MODE.PaletteManager.WIDTH" value="120" />
-    <property name="UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.WIDTH" value="175" />
+    <property name="UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.SHOW" value="true" />
+    <property name="UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.WIDTH" value="217" />
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1569969812036" />
     <property name="last_opened_file_path" value="$USER_HOME$/Downloads/mysql-connector-java-8.0.16/mysql-connector-java-8.0.16.jar!/" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
+    <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="preferences.general" />
   </component>
   <component name="RunDashboard">
@@ -107,7 +109,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
@@ -139,6 +143,14 @@
             <option name="EMULATED" value="true" />
           </properties>
           <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/gui/GUI.java</url>
+          <line>133</line>
+          <properties class="gui.GUI" method="showUser">
+            <option name="EMULATED" value="true" />
+          </properties>
+          <option name="timeStamp" value="5" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

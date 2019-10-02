@@ -49,19 +49,14 @@ public class DialogUser extends JDialog {
     }
 
     private void onOK() {
-        try {
-            int legajo = Integer.parseInt(userTextField.getText());
-            boolean conecto = mainGUI.connectEmpleado(legajo, passwordField.getPassword());
-            if (!conecto) {
-                errorLabel.setVisible(true);
-            } else {
-                mainGUI.showUser();
-                dispose();
-            }
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
+        String legajo = userTextField.getText();
+        boolean conecto = mainGUI.connectEmpleado(legajo, passwordField.getPassword());
+        if (!conecto) {
+            errorLabel.setVisible(true);
+        } else {
+            mainGUI.showUser();
+            dispose();
         }
-
     }
 
     private void onCancel() {
