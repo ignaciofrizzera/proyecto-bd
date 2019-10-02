@@ -1,7 +1,9 @@
 package logica;
 
 import java.sql.*;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedList;
 
 public class Logica {
@@ -47,6 +49,11 @@ public class Logica {
                     System.out.print(x + " ");
                 }
                 System.out.println("");
+            }
+
+            Collection<String> lista_aux = logic.ciudades_origen();
+            for(String p : lista_aux){
+                System.out.println(p);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -226,8 +233,8 @@ public class Logica {
 
     /**
      * Recibe una query del usuario e intenta ejecutarla
-     *
      * @param query query a ejecutarse
+     * @return una coleccion con todos los datos de la tabla obtenida por la query
      */
     public Collection<Collection<String>> recibir_query(String query) throws SQLException {
         Collection<Collection<String>> data = new LinkedList<>();
@@ -256,5 +263,52 @@ public class Logica {
         }
         return data;
     }
+
+    /**
+     * Calcula todas las ciudades de las que parte un vuelo
+     * @return coleccion con las ciudades de las que sale un vuelo
+     */
+    public Collection<String> ciudades_origen(){
+        LinkedList<String> ciudades = new LinkedList<String>();
+        try {
+            String query = "select ciudad from vuelos_programados join aeropuertos on aeropuerto_salida = codigo";
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(query);
+            while(rs.next()){
+                ciudades.add(rs.getString(1));
+            }
+            st.close();
+            rs.close();
+        }
+        catch(SQLException e){
+        }
+        return ciudades;
+    }
+
+    /**
+     * Calcula todas las ciudades a las que llega un vuelo
+     * @return coleccion con las ciudades de las que llega un vuelo
+     */
+    public Collection<String> ciudades_destino(){
+        LinkedList<String> ciudades = new LinkedList<String>();
+        try {
+            String query = "select ciudad from vuelos_programados join aeropuertos on aeropuerto_llegada = codigo";
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(query);
+            while(rs.next()){
+                ciudades.add(rs.getString(1));
+            }
+            st.close();
+            rs.close();
+        }
+        catch(SQLException e){
+        }
+        return ciudades;
+    }
+
+    public Collection<Collection<String>> buscar_vuelos(String ciudad_origen, String ciudad_destino, Date fecha){
+        return null;
+    }
+
 
 }

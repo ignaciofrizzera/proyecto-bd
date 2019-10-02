@@ -202,4 +202,3 @@ public class GUI {
         valuesTableModel.setColumnCount(0);
     }
 }
-
