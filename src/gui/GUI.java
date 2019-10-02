@@ -17,7 +17,7 @@ public class GUI {
     private JPanel mainPanel;
     private JTextArea textSQL;
     private JTable valuesTable;
-    private JPanel panelAdmin;
+    private javax.swing.JPanel panelAdmin;
     private JPanel panelUser;
     private JLabel ciudadOrigen;
     private JComboBox origenComboBox;
@@ -27,16 +27,18 @@ public class GUI {
     private JTextField diaIdaText;
     private JTextField mesIdaText;
     private JTable tablaViajesDisponibles;
-    private JList tablesList;
+    private JList<String> tablesList;
     private JButton consultarButton;
-    private JList atributeList;
+    private JList<String> atributeList;
     private JPanel panelFechaIda;
     private JPanel panelFechaVuelta;
     private JTextField añoIdaText;
     private JTextField diaVueltaText;
     private JTextField mesVueltaText;
     private JTextField añoVueltaText;
-    private DefaultListModel tablesListModel, atributeListModel;
+    private JPanel panelCiudades;
+    private DefaultListModel<String> tablesListModel;
+    private DefaultListModel<String> atributeListModel;
     private DefaultTableModel valuesTableModel;
     private Logica logica;
 
@@ -80,7 +82,7 @@ public class GUI {
         tablesList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
-                String selectedTable = (String) tablesList.getSelectedValue();
+                String selectedTable = tablesList.getSelectedValue();
 
                 atributeListModel.removeAllElements();
                 atributeListModel.addAll(logica.get_atributos(selectedTable));
@@ -190,11 +192,11 @@ public class GUI {
 
 
     private void createUIComponents() {
-        tablesListModel = new DefaultListModel();
-        tablesList = new JList(tablesListModel);
+        tablesListModel = new DefaultListModel<String>();
+        tablesList = new JList<String>(tablesListModel);
 
-        atributeListModel = new DefaultListModel();
-        atributeList = new JList(atributeListModel);
+        atributeListModel = new DefaultListModel<>();
+        atributeList = new JList<String>(atributeListModel);
 
         valuesTableModel = new DefaultTableModel();
         valuesTable = new JTable(valuesTableModel);
