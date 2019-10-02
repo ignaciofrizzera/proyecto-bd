@@ -231,6 +231,8 @@ public class Logica {
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(query);
             String print = "";
+
+            rs.get
             while(rs.next()){
                 /**TODO
                  * Preguntar como no harcodear esto*/

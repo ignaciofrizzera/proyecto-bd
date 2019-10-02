@@ -9,7 +9,7 @@ import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.Collections;
 
-public class GUI{
+public class GUI {
     private JButton adminButton;
     private JButton userButton;
     private JPanel mainPanel;
@@ -26,12 +26,13 @@ public class GUI{
     private JTextField monthText;
     private JTable table1;
     private JList tablesList;
+    private JButton consultarButton;
+    private DefaultListModel tablesModel;
     private Logica logica;
 
-    public GUI(){
+    public GUI() {
         GUI myGUI = this;
         logica = new Logica();
-
 
         adminButton.addActionListener(new ActionListener() {
             @Override
@@ -39,6 +40,7 @@ public class GUI{
                 DialogAdmin dialog = new DialogAdmin(myGUI);
                 dialog.pack();
                 dialog.setVisible(true);
+
             }
         });
         userButton.addActionListener(new ActionListener() {
@@ -51,52 +53,64 @@ public class GUI{
         });
 
 
+        consultarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                String query = textSQL.getText();
 
+                logica.recibir_query(query);
+            }
+        });
     }
 
     /**
      * Conecta con la base de datos como administrador con la contraseña especificados.
-     * @param password  Contraseña.
+     *
+     * @param password Contraseña.
      * @return true si pudo conectar, false en caso contrario.
      */
 
-    public boolean connectAdmin(char[] password){
-        return true;
+    public boolean connectAdmin(char[] password) {
+        return logica.conectar_admin(password);
     }
 
     /**
      * Conecta con la base de datos como empleado, con el legajo y contraseña especificados.
-     * @param legajo    Legajo del empleado.
-     * @param password  Password del empleado.
+     *
+     * @param legajo   Legajo del empleado.
+     * @param password Password del empleado.
      * @return true si pudo conectar, false en caso contrario.
      */
-    public boolean connectEmpleado(int legajo, char[] password){
-
-        //aca llamo a la logica y devuelvo
-
-        return true;
+    public boolean connectEmpleado(int legajo, char[] password) {
+        return connectEmpleado(legajo, password);
     }
 
-    public void showAdmin(){
+    public void showAdmin() {
         userButton.setVisible(false);
         adminButton.setVisible(false);
         panelAdmin.setVisible(true);
+
+        Collection<String> tablas = logica.get_tablas();
+
+        for(String tabla: tablas){
+            tablesModel.addElement(tabla);
+        }
     }
 
-    public void showUser(){
+    public void showUser() {
         userButton.setVisible(false);
         adminButton.setVisible(false);
         panelUser.setVisible(true);
     }
 
-    public static void main (String [] args){
+    public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 try {
-                    GUI g= new GUI();
+                    GUI g = new GUI();
                     JFrame frame = new JFrame();
-                    frame.setSize(1280,720);
+                    frame.setSize(1280, 720);
                     frame.setVisible(true);
                     frame.setContentPane(g.mainPanel);
                 } catch (Exception e) {
@@ -106,10 +120,11 @@ public class GUI{
         });
     }
 
+
     private void createUIComponents() {
-        // TODO: place custom component creation code here
-        String[] tablas = (String[]) logica.get_tablas().toArray();
-        tablesList = new JList(tablas);
+        tablesModel = new DefaultListModel();
+        tablesList = new JList(tablesModel);
+
     }
 }
 
