@@ -401,7 +401,6 @@ public class Logica {
     public void shutdown(){
         try {
             con.close();
-            con = null;
         }
         catch(SQLException e){
             System.out.println(e.getMessage());
