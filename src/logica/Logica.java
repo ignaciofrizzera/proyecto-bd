@@ -56,6 +56,8 @@ public class Logica {
             Date fecha = fechas.Fechas.convertirStringADate("03/10/2019");
 
             logic.buscar_vuelos("La Plata", "Hola", fecha);
+            logic.info_vuelo(0001,fecha);
+            System.out.println("asd");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -371,6 +373,41 @@ public class Logica {
         }
         return data;
     }
+
+    /**
+     * Metodo que obtiene informacion de las clases, precios y asientos disponibles de un vuelo
+     * @param num_vuelo numero del vuelo
+     * @param fecha fecha en la que es el vuelo
+     * @return coleccion con la informacion de asientos disponibles, clases y precios del vuelo
+     */
+    public Collection<Collection<String>> info_vuelo(int num_vuelo, Date fecha){
+        Collection<Collection<String>> data = new LinkedList<>();
+        try {
+            Date fecha_sql = fechas.Fechas.convertirDateADateSQL(fecha);
+            String query = "select clase, cant_libres as asientos_disponibles, precio" +
+                    " from vuelos_disponibles" +
+                    " where vuelo = " + num_vuelo + " and fecha = '" + fecha_sql + "'";
+            data = this.ejecutar_query(query);
+        }
+        catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return data;
+    }
+
+    /**
+     * Metodo utilizado para finalizar la conexion con la base de datos
+     */
+    public void shutdown(){
+        try {
+            con.close();
+            con = null;
+        }
+        catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+    }
+
 
 
 }
