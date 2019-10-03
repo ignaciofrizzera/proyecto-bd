@@ -55,6 +55,9 @@ public class Logica {
             for(String p : lista_aux){
                 System.out.println(p);
             }
+            Date fecha = fechas.Fechas.convertirStringADate("03/10/2019");
+
+            logic.buscar_vuelos("La Plata","Hola", fecha);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -261,17 +264,22 @@ public class Logica {
             data.add(lista_aux);
             i = 1;
         }
+        pst.close();
+        rst.close();
+        rsmd = null;
         return data;
     }
 
     /**
      * Calcula todas las ciudades de las que parte un vuelo
-     * @return coleccion con las ciudades de las que sale un vuelo
+     * @return coleccion con las ciudades de las que parte un vuelo
      */
     public Collection<String> ciudades_origen(){
         LinkedList<String> ciudades = new LinkedList<String>();
         try {
-            String query = "select ciudad from vuelos_programados join aeropuertos on aeropuerto_salida = codigo";
+            String query = "select ciudad" +
+                           " from vuelos_programados join aeropuertos on aeropuerto_salida = codigo" +
+                           " group by ciudad";
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(query);
             while(rs.next()){
@@ -292,7 +300,9 @@ public class Logica {
     public Collection<String> ciudades_destino(){
         LinkedList<String> ciudades = new LinkedList<String>();
         try {
-            String query = "select ciudad from vuelos_programados join aeropuertos on aeropuerto_llegada = codigo";
+            String query = "select ciudad" +
+                           " from vuelos_programados join aeropuertos on aeropuerto_llegada = codigo" +
+                           " group by ciudad";
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(query);
             while(rs.next()){
@@ -306,8 +316,28 @@ public class Logica {
         return ciudades;
     }
 
+    /**
+     * Retorna vuelo/s que van de ciudad_origen a ciudad_destino en la fecha pasaa por parametor
+     * @param ciudad_origen ciudad de donde parte el vuelo
+     * @param ciudad_destino ciudad a donde se dirige el vuelo
+     * @param fecha fecha en la que sale el vuelo
+     * @return tabla que contiene el numero de vuelo, el aeropuerto de salida, la hora de salida, el aeropuerto de llegada
+     *  la hora de llegada, el modelo del avion y el tiempo estimado
+     */
     public Collection<Collection<String>> buscar_vuelos(String ciudad_origen, String ciudad_destino, Date fecha){
-        return null;
+        Collection<Collection<String>> data = new LinkedList<>();
+        try{
+            Date fecha_sql = fechas.Fechas.convertirDateADateSQL(fecha);
+            String query = " select vuelo, nombre_salida as aeropuerto_salida , hora_sale, aeropuerto_llegada, hora_llega, modelo_avion, tiempo_estimado" +
+                           " from vuelos_disponibles" +
+                           " where fecha = '" + fecha_sql + "' and ciudad_salida = '" + ciudad_origen + "' and ciudad_llegada = '" + ciudad_destino + "' "+
+                           " group by vuelo, aeropuerto_salida, hora_sale, aeropuerto_llegada, hora_llega, modelo_avion, tiempo_estimado";
+            data = this.recibir_query(query);
+        }
+        catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return data;
     }
 
 
