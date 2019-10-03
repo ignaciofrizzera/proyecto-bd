@@ -1,10 +1,8 @@
 package logica;
 
 import java.sql.*;
-import java.util.Calendar;
-import java.util.Collection;
+import java.util.*;
 import java.util.Date;
-import java.util.LinkedList;
 
 public class Logica {
 
@@ -43,7 +41,7 @@ public class Logica {
             else
                 System.out.println("No conecto con exito :( !!");
 
-            Collection<Collection<String>> aux = logic.recibir_query("select *from aeropuertos");
+            Collection<Collection<String>> aux = logic.ejecutar_query("select *from aeropuertos");
             for (Collection<String> c : aux) {
                 for (String x : c) {
                     System.out.print(x + " ");
@@ -52,12 +50,12 @@ public class Logica {
             }
 
             Collection<String> lista_aux = logic.ciudades_origen();
-            for(String p : lista_aux){
+            for (String p : lista_aux) {
                 System.out.println(p);
             }
             Date fecha = fechas.Fechas.convertirStringADate("03/10/2019");
 
-            logic.buscar_vuelos("La Plata","Hola", fecha);
+            logic.buscar_vuelos("La Plata", "Hola", fecha);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -235,11 +233,45 @@ public class Logica {
 
 
     /**
-     * Recibe una query del usuario e intenta ejecutarla
-     * @param query query a ejecutarse
-     * @return una coleccion con todos los datos de la tabla obtenida por la query
+     * Recibe una sentencia SQL del usuario e intenta ejecutarla
+     *
+     * @param statement sentencia a ejecutarse
+     * @return coleccion con datos de una consulta o null en caso de hacer un insert / update / create
      */
-    public Collection<Collection<String>> recibir_query(String query) throws SQLException {
+    public Collection<Collection<String>> recibir_statement(String statement) throws SQLException {
+        StringTokenizer str_tok = new StringTokenizer(statement, " ");
+        String primer_palabra = str_tok.nextToken();
+        primer_palabra = primer_palabra.toLowerCase();
+
+        if (primer_palabra.equals("insert") ||
+                primer_palabra.equals("update") ||
+                primer_palabra.equals("create") ||
+                primer_palabra.equals("delete")) {
+            this.ejecutar_update(statement);
+            return null;
+        } else {
+            return ejecutar_query(statement);
+        }
+    }
+
+    /**
+     * Ejecuta un update/insert/delete o create sobre la base de datos
+     * @param update sentencia a ejecutar
+     * @throws SQLException excepcion en caso de sentencia invalida o dato ya creado
+     */
+    private void ejecutar_update(String update) throws SQLException {
+        Statement st = con.createStatement();
+        st.executeUpdate(update);
+    }
+
+    /**
+     * Ejecuta una query recibida por parametro
+     *
+     * @param query query a ejecutarse
+     * @return conjunto de tablas y valores sobre los que se realizo la query
+     * @throws SQLException caso de que la query posea algun error
+     */
+    private Collection<Collection<String>> ejecutar_query(String query) throws SQLException {
         Collection<Collection<String>> data = new LinkedList<>();
         PreparedStatement pst = con.prepareStatement(query);
         ResultSet rst = pst.executeQuery();
@@ -272,69 +304,69 @@ public class Logica {
 
     /**
      * Calcula todas las ciudades de las que parte un vuelo
+     *
      * @return coleccion con las ciudades de las que parte un vuelo
      */
-    public Collection<String> ciudades_origen(){
+    public Collection<String> ciudades_origen() {
         LinkedList<String> ciudades = new LinkedList<String>();
         try {
             String query = "select ciudad" +
-                           " from vuelos_programados join aeropuertos on aeropuerto_salida = codigo" +
-                           " group by ciudad";
+                    " from vuelos_programados join aeropuertos on aeropuerto_salida = codigo" +
+                    " group by ciudad";
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(query);
-            while(rs.next()){
+            while (rs.next()) {
                 ciudades.add(rs.getString(1));
             }
             st.close();
             rs.close();
-        }
-        catch(SQLException e){
+        } catch (SQLException e) {
         }
         return ciudades;
     }
 
     /**
      * Calcula todas las ciudades a las que llega un vuelo
+     *
      * @return coleccion con las ciudades de las que llega un vuelo
      */
-    public Collection<String> ciudades_destino(){
+    public Collection<String> ciudades_destino() {
         LinkedList<String> ciudades = new LinkedList<String>();
         try {
             String query = "select ciudad" +
-                           " from vuelos_programados join aeropuertos on aeropuerto_llegada = codigo" +
-                           " group by ciudad";
+                    " from vuelos_programados join aeropuertos on aeropuerto_llegada = codigo" +
+                    " group by ciudad";
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(query);
-            while(rs.next()){
+            while (rs.next()) {
                 ciudades.add(rs.getString(1));
             }
             st.close();
             rs.close();
-        }
-        catch(SQLException e){
+        } catch (SQLException e) {
         }
         return ciudades;
     }
 
     /**
      * Retorna vuelo/s que van de ciudad_origen a ciudad_destino en la fecha pasaa por parametor
-     * @param ciudad_origen ciudad de donde parte el vuelo
+     *
+     * @param ciudad_origen  ciudad de donde parte el vuelo
      * @param ciudad_destino ciudad a donde se dirige el vuelo
-     * @param fecha fecha en la que sale el vuelo
+     * @param fecha          fecha en la que sale el vuelo
      * @return tabla que contiene el numero de vuelo, el aeropuerto de salida, la hora de salida, el aeropuerto de llegada
-     *  la hora de llegada, el modelo del avion y el tiempo estimado
+     * la hora de llegada, el modelo del avion y el tiempo estimado
      */
-    public Collection<Collection<String>> buscar_vuelos(String ciudad_origen, String ciudad_destino, Date fecha){
+    public Collection<Collection<String>> buscar_vuelos(String ciudad_origen, String ciudad_destino, Date fecha) {
         Collection<Collection<String>> data = new LinkedList<>();
-        try{
+        try {
             Date fecha_sql = fechas.Fechas.convertirDateADateSQL(fecha);
             String query = " select vuelo, nombre_salida as aeropuerto_salida , hora_sale, aeropuerto_llegada, hora_llega, modelo_avion, tiempo_estimado" +
-                           " from vuelos_disponibles" +
-                           " where fecha = '" + fecha_sql + "' and ciudad_salida = '" + ciudad_origen + "' and ciudad_llegada = '" + ciudad_destino + "' "+
-                           " group by vuelo, aeropuerto_salida, hora_sale, aeropuerto_llegada, hora_llega, modelo_avion, tiempo_estimado";
-            data = this.recibir_query(query);
-        }
-        catch(SQLException e){
+                    " from vuelos_disponibles" +
+                    " where fecha = '" + fecha_sql + "' and ciudad_salida = '" + ciudad_origen + "' and ciudad_llegada = '" + ciudad_destino + "' " +
+                    " group by vuelo, aeropuerto_salida, hora_sale, aeropuerto_llegada, hora_llega, modelo_avion, tiempo_estimado";
+            data = this.ejecutar_query(query);
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
         return data;
