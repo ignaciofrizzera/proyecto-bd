@@ -9,8 +9,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedList;
 
 public class GUI {
     private JButton adminButton;
@@ -27,7 +27,7 @@ public class GUI {
     private JCheckBox idaVueltaCheckBox;
     private JTextField diaIdaText;
     private JTextField mesIdaText;
-    private JTable tablaViajesDisponibles;
+    private JTable tableViajesIda;
     private JList<String> tablesList;
     private JButton consultarButton;
     private JList<String> atributeList;
@@ -39,9 +39,15 @@ public class GUI {
     private JTextField añoVueltaText;
     private JPanel panelCiudades;
     private JButton buscarVuelosButton;
+    private JTable tableViajesVuelta;
+    private JTable tableVueloElegido;
     private DefaultListModel<String> tablesListModel;
     private DefaultListModel<String> atributeListModel;
+    private DefaultTableModel tableViajesIdaModel;
     private DefaultTableModel valuesTableModel;
+    private DefaultTableModel tableViajesVueltaModel;
+    private DefaultTableModel tableVueloElegidoModel;
+
     private Logica logica;
 
     public GUI() {
@@ -73,7 +79,7 @@ public class GUI {
                 String query = textSQL.getText();
                 try {
                     Collection<Collection<String>> resultado = logica.recibir_query(query);
-                    updateTableSQL(resultado);
+                    updateTable(valuesTableModel, resultado);
                 } catch (SQLException e) {
                     showError(e.getMessage());
                 }
@@ -124,8 +130,10 @@ public class GUI {
                 diaVuelta,
                 mesVuelta,
                 añoVuelta,
-                fechaIda,
-                fechaVuelta;
+                stringFechaIda,
+                stringFechaVuelta;
+
+        Date fechaIda, fechaVuelta;
 
         ciudadOrigen = (String) origenComboBox.getSelectedItem();
         ciudadDestino = (String) destinoComboBox.getSelectedItem();
@@ -133,28 +141,34 @@ public class GUI {
         mesIda = mesIdaText.getText();
         añoIda = añoIdaText.getText();
 
-        fechaIda = diaIda+"/"+mesIda+"/"+añoIda;
+        stringFechaIda = diaIda + "/" + mesIda + "/" + añoIda;
 
-        if (!Fechas.validar(fechaIda)){
+        if (!Fechas.validar(stringFechaIda)) {
             showError("Fecha de ida invalida.");
             return;
         }
 
+        fechaIda = Fechas.convertirStringADate(stringFechaIda);
+        Collection<Collection<String>> vuelosDisponiblesIda=logica.buscar_vuelos(ciudadOrigen, ciudadDestino, fechaIda);;
+        tableViajesIda.setVisible(true);
+        updateTable(tableViajesIdaModel, vuelosDisponiblesIda);
 
-            // llamar a buscar los vuelos que matcheen con la ida
-
-        if (idaVueltaCheckBox.isSelected()){
+        if (idaVueltaCheckBox.isSelected()) {
             diaVuelta = diaVueltaText.getText();
             mesVuelta = mesVueltaText.getText();
             añoVuelta = añoVueltaText.getText();
 
-            fechaVuelta = diaVuelta+"/"+mesVuelta+"/"+añoVuelta;
+            stringFechaVuelta = diaVuelta + "/" + mesVuelta + "/" + añoVuelta;
 
-            if(!Fechas.validar(fechaVuelta)){
+            if (!Fechas.validar(stringFechaVuelta)) {
                 showError("Fecha de vuelta invalida.");
                 return;
             }
-            // llamar a buscar los vuelos que matcheen con la vuelta
+
+            fechaVuelta = Fechas.convertirStringADate(stringFechaVuelta);
+            Collection<Collection<String>> vuelosDisponiblesVuelta = logica.buscar_vuelos(ciudadDestino, ciudadOrigen, fechaVuelta);
+            tableViajesVuelta.setVisible(true);
+            updateTable(tableViajesVueltaModel, vuelosDisponiblesVuelta);
         }
     }
 
@@ -166,9 +180,9 @@ public class GUI {
 
     }
 
-    private void updateTableSQL(Collection<Collection<String>> result) {
-        valuesTableModel.setColumnCount(0);
-        valuesTableModel.setRowCount(0);
+    private void updateTable(DefaultTableModel model, Collection<Collection<String>> result) {
+        model.setColumnCount(0);
+        model.setRowCount(0);
 
         Iterator<Collection<String>> iterator = result.iterator();
 
@@ -176,13 +190,13 @@ public class GUI {
             Collection<String> columns = iterator.next();
 
             for (String column : columns) {
-                valuesTableModel.addColumn(column);
+                model.addColumn(column);
             }
 
             while (iterator.hasNext()) {
                 Collection<String> rowAux = iterator.next();
                 Object[] row = rowAux.toArray();
-                valuesTableModel.addRow(row);
+                model.addRow(row);
             }
         }
     }
@@ -226,7 +240,18 @@ public class GUI {
         adminButton.setVisible(false);
         panelUser.setVisible(true);
 
-        Collection<Collection<String>> c1 = new LinkedList<>();
+        Collection<String> ciudadesOrigen, ciudadesDestino;
+        ciudadesOrigen = logica.ciudades_origen();
+        ciudadesDestino = logica.ciudades_destino();
+
+        for (String ciudad : ciudadesOrigen) {
+            origenComboBox.addItem(ciudad);
+        }
+
+        for (String ciudad : ciudadesDestino) {
+            destinoComboBox.addItem(ciudad);
+        }
+
     }
 
     public static void main(String[] args) {
@@ -236,7 +261,7 @@ public class GUI {
                 try {
                     GUI g = new GUI();
                     JFrame frame = new JFrame();
-                    frame.setSize(1280, 720);
+                    frame.setSize(1920, 1080);
                     frame.setVisible(true);
                     frame.setContentPane(g.mainPanel);
                 } catch (Exception e) {
@@ -256,7 +281,14 @@ public class GUI {
 
         valuesTableModel = new DefaultTableModel();
         valuesTable = new JTable(valuesTableModel);
-        valuesTableModel.setRowCount(0);
-        valuesTableModel.setColumnCount(0);
+
+        tableViajesIdaModel = new DefaultTableModel();
+        tableViajesIda = new JTable(tableViajesIdaModel);
+
+        tableViajesVueltaModel = new DefaultTableModel();
+        tableViajesVuelta = new JTable(tableViajesVueltaModel);
+
+        tableVueloElegidoModel = new DefaultTableModel();
+        tableVueloElegido = new JTable(tableVueloElegidoModel);
     }
 }
