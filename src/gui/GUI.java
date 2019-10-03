@@ -78,10 +78,15 @@ public class GUI {
             public void actionPerformed(ActionEvent actionEvent) {
                 String query = textSQL.getText();
                 try {
-                    Collection<Collection<String>> resultado = logica.recibir_query(query);
-                    updateTable(valuesTableModel, resultado);
+                    Collection<Collection<String>> resultado = logica.recibir_statement(query);
+
+                    if (resultado != null) {
+                        updateTable(valuesTableModel, resultado);
+                    } else {
+                        showMsg("Se actualizó la base de datos correctamente");
+                    }
                 } catch (SQLException e) {
-                    showError(e.getMessage());
+                    showMsg(e.getMessage());
                 }
 
             }
@@ -120,7 +125,7 @@ public class GUI {
             }
         });
 
-        
+
     }
 
     private void buscarVuelos() {
@@ -146,12 +151,12 @@ public class GUI {
         stringFechaIda = diaIda + "/" + mesIda + "/" + añoIda;
 
         if (!Fechas.validar(stringFechaIda)) {
-            showError("Fecha de ida invalida.");
+            showMsg("Fecha de ida invalida.");
             return;
         }
 
         fechaIda = Fechas.convertirStringADate(stringFechaIda);
-        Collection<Collection<String>> vuelosDisponiblesIda=logica.buscar_vuelos(ciudadOrigen, ciudadDestino, fechaIda);
+        Collection<Collection<String>> vuelosDisponiblesIda = logica.buscar_vuelos(ciudadOrigen, ciudadDestino, fechaIda);
         tableViajesIda.setVisible(true);
         updateTable(tableViajesIdaModel, vuelosDisponiblesIda);
 
@@ -163,7 +168,7 @@ public class GUI {
             stringFechaVuelta = diaVuelta + "/" + mesVuelta + "/" + añoVuelta;
 
             if (!Fechas.validar(stringFechaVuelta)) {
-                showError("Fecha de vuelta invalida.");
+                showMsg("Fecha de vuelta invalida.");
                 return;
             }
 
@@ -175,8 +180,8 @@ public class GUI {
     }
 
 
-    private void showError(String msg) {
-        DialogError dialog = new DialogError(msg);
+    private void showMsg(String msg) {
+        DialogMsg dialog = new DialogMsg(msg);
         dialog.pack();
         dialog.setVisible(true);
 

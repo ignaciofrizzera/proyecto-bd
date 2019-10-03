@@ -2,13 +2,13 @@ package gui;
 
 import javax.swing.*;
 
-public class DialogError extends javax.swing.JDialog {
+public class DialogMsg extends javax.swing.JDialog {
     private javax.swing.JPanel contentPane;
     private javax.swing.JButton buttonOK;
     private javax.swing.JButton buttonCancel;
     private JLabel errorLabel;
 
-    public DialogError(String msg) {
+    public DialogMsg(String msg) {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
