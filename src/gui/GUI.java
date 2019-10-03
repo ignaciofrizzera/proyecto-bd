@@ -119,6 +119,8 @@ public class GUI {
                 buscarVuelos();
             }
         });
+
+        
     }
 
     private void buscarVuelos() {
@@ -149,7 +151,7 @@ public class GUI {
         }
 
         fechaIda = Fechas.convertirStringADate(stringFechaIda);
-        Collection<Collection<String>> vuelosDisponiblesIda=logica.buscar_vuelos(ciudadOrigen, ciudadDestino, fechaIda);;
+        Collection<Collection<String>> vuelosDisponiblesIda=logica.buscar_vuelos(ciudadOrigen, ciudadDestino, fechaIda);
         tableViajesIda.setVisible(true);
         updateTable(tableViajesIdaModel, vuelosDisponiblesIda);
 
@@ -291,4 +293,6 @@ public class GUI {
         tableVueloElegidoModel = new DefaultTableModel();
         tableVueloElegido = new JTable(tableVueloElegidoModel);
     }
+
+
 }
