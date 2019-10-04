@@ -20,48 +20,6 @@ public class Logica {
      * Main de testeo
      */
     public static void main(String[] args) {
-        Logica logic = new Logica();
-        logic.establecer_conexion("admin", "admin");
-        logic.get_tablas();
-        logic.get_atributos("aeropuertos");
-
-        char hola[];
-        hola = new char[7];
-        hola[0] = 'h';
-        hola[1] = 'o';
-        hola[2] = 'l';
-        hola[3] = 'a';
-        hola[4] = '1';
-        hola[5] = '2';
-        hola[6] = '3';
-
-        try {
-            if (logic.conectar_empleado("117815", hola))
-                System.out.println("Conecto con exito :D !!!");
-            else
-                System.out.println("No conecto con exito :( !!");
-
-            Collection<Collection<String>> aux = logic.ejecutar_query("select *from aeropuertos");
-            for (Collection<String> c : aux) {
-                for (String x : c) {
-                    System.out.print(x + " ");
-                }
-                System.out.println("");
-            }
-
-            Collection<String> lista_aux = logic.ciudades_origen();
-            for (String p : lista_aux) {
-                System.out.println(p);
-            }
-            Date fecha = fechas.Fechas.convertirStringADate("03/10/2019");
-
-            logic.buscar_vuelos("La Plata", "Hola", fecha);
-            System.out.println("pase buscar vuelo");
-            logic.info_vuelo(0001,fecha);
-            System.out.println("asd");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -403,7 +361,9 @@ public class Logica {
      */
     public void shutdown(){
         try {
-            con.close();
+            if(con!= null && !con.isClosed()) {
+                con.close();
+            }
         }
         catch(SQLException e){
             System.out.println(e.getMessage());
