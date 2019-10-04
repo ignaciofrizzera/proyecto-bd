@@ -155,7 +155,7 @@ public class GUI {
         stringFechaIda = diaIda + "/" + mesIda + "/" + añoIda;
 
         if (!Fechas.validar(stringFechaIda)) {
-            showMsg("Fecha de ida invalida.");
+            showMsg("Fecha de ida inválida.");
             return;
         }
 
@@ -172,7 +172,7 @@ public class GUI {
             stringFechaVuelta = diaVuelta + "/" + mesVuelta + "/" + añoVuelta;
 
             if (!Fechas.validar(stringFechaVuelta)) {
-                showMsg("Fecha de vuelta invalida.");
+                showMsg("Fecha de vuelta inválida.");
                 return;
             }
 
@@ -196,7 +196,7 @@ public class GUI {
         model.setRowCount(0);
 
         if (model==null || result == null){
-            showMsg("error result es null o model es null");
+            showMsg("Error result es null o model es null");
             return;
         }
 
@@ -315,9 +315,6 @@ public class GUI {
         tableVueloElegido = new JTable(tableVueloElegidoModel);
     }
 
-    //Este hay que borrarlo
-    Collection<Collection<String>> doSo(){return null;}
-
     private class ElegirVueloListener extends MouseAdapter {
         private DefaultTableModel myModel;
         private JTable myTable;
@@ -332,12 +329,10 @@ public class GUI {
             int vuelo = Integer.parseInt(stringVuelo);
 
             String datesString = (String) myModel.getValueAt(myTable.getSelectedRow(), myTable.getColumnCount()-1);
+            Date fecha = Fechas.convertirStringADate(datesString);
 
-            showMsg(datesString);
-
-            /*
-            Collection<Collection<String>> res = logica.info_vuelo();
-            updateTable(tableVueloElegidoModel, res);*/
+            Collection<Collection<String>> res = logica.info_vuelo(vuelo, fecha);
+            updateTable(tableVueloElegidoModel, res);
 
         }
     }
