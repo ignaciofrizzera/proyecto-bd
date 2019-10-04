@@ -364,9 +364,9 @@ public class Logica {
         Collection<Collection<String>> data = new LinkedList<>();
         try {
             Date fecha_sql = fechas.Fechas.convertirDateADateSQL(fecha);
-            String formato_devuelto = "'%d %M %Y'";
+            String formato_devuelto = "'%d/%m/%Y'";
             String query = " select vuelo, nombre_salida as aeropuerto_salida , hora_sale," +
-                    " aeropuerto_llegada, hora_llega, modelo_avion, tiempo_estimado, date_format(fecha, " + formato_devuelto +")" +
+                    " aeropuerto_llegada, hora_llega, modelo_avion, tiempo_estimado, date_format(fecha, " + formato_devuelto +") as fecha" +
                     " from vuelos_disponibles" +
                     " where fecha = '" + fecha_sql + "' and ciudad_salida = '" + ciudad_origen + "' and ciudad_llegada = '" + ciudad_destino + "' " +
                     " group by vuelo, aeropuerto_salida, hora_sale, aeropuerto_llegada, hora_llega, modelo_avion, tiempo_estimado";
