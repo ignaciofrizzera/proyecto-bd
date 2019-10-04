@@ -48,7 +48,7 @@ public class GUI {
     private DefaultTableModel tableViajesVueltaModel;
     private DefaultTableModel tableVueloElegidoModel;
 
-    private Logica logica;
+    private static Logica logica;
 
     public GUI() {
         GUI myGUI = this;
@@ -283,7 +283,7 @@ public class GUI {
                     frame.addWindowListener(new WindowAdapter() {
                         @Override
                         public void windowClosing(WindowEvent e) {
-                            // aca llamo a logica.close o algo asi
+                            logica.shutdown();
                             System.exit(0);
                         }
                     });
@@ -328,7 +328,13 @@ public class GUI {
         }
 
         public void mouseClicked(MouseEvent e) {
-            Collection<Collection<String>> res = doSo(); //logica. get info vuelo
+            int vuelo;
+            String stringVuelo = (String) myModel.getValueAt(myTable.getSelectedRow(), 0);
+            vuelo = Integer.parseInt(stringVuelo);
+
+            
+
+            Collection<Collection<String>> res = logica.info_vuelo();
             updateTable(tableVueloElegidoModel, res);
 
         }
