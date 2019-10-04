@@ -56,6 +56,7 @@ public class Logica {
             Date fecha = fechas.Fechas.convertirStringADate("03/10/2019");
 
             logic.buscar_vuelos("La Plata", "Hola", fecha);
+            System.out.println("pase buscar vuelo");
             logic.info_vuelo(0001,fecha);
             System.out.println("asd");
         } catch (SQLException e) {
@@ -363,7 +364,9 @@ public class Logica {
         Collection<Collection<String>> data = new LinkedList<>();
         try {
             Date fecha_sql = fechas.Fechas.convertirDateADateSQL(fecha);
-            String query = " select vuelo, nombre_salida as aeropuerto_salida , hora_sale, aeropuerto_llegada, hora_llega, modelo_avion, tiempo_estimado" +
+            String formato_devuelto = "'%d %M %Y'";
+            String query = " select vuelo, nombre_salida as aeropuerto_salida , hora_sale," +
+                    " aeropuerto_llegada, hora_llega, modelo_avion, tiempo_estimado, date_format(fecha, " + formato_devuelto +")" +
                     " from vuelos_disponibles" +
                     " where fecha = '" + fecha_sql + "' and ciudad_salida = '" + ciudad_origen + "' and ciudad_llegada = '" + ciudad_destino + "' " +
                     " group by vuelo, aeropuerto_salida, hora_sale, aeropuerto_llegada, hora_llega, modelo_avion, tiempo_estimado";
