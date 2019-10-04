@@ -328,14 +328,16 @@ public class GUI {
         }
 
         public void mouseClicked(MouseEvent e) {
-            int vuelo;
             String stringVuelo = (String) myModel.getValueAt(myTable.getSelectedRow(), 0);
-            vuelo = Integer.parseInt(stringVuelo);
+            int vuelo = Integer.parseInt(stringVuelo);
 
-            
+            String datesString = (String) myModel.getValueAt(myTable.getSelectedRow(), myTable.getColumnCount()-1);
 
+            showMsg(datesString);
+
+            /*
             Collection<Collection<String>> res = logica.info_vuelo();
-            updateTable(tableVueloElegidoModel, res);
+            updateTable(tableVueloElegidoModel, res);*/
 
         }
     }
