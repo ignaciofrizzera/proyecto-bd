@@ -4,12 +4,16 @@ import java.sql.*;
 import java.util.*;
 import java.util.Date;
 
+/**
+ * Clase destinada a realizar la comunicacion con la base de datos mediante
+ * querys y sentencias recibidas
+ */
 public class Logica {
 
     private final String server = "localhost:3306";
     private final String base_datos = "vuelos";
     private final String admin = "admin";
-
+    private final String empleado = "empleado";
     private final String url = "jdbc:mysql://" + server + "/" + base_datos +
             "?serverTimezone=America/Argentina/Buenos_Aires";
 
@@ -31,7 +35,7 @@ public class Logica {
      */
     public boolean conectar_admin(char[] password) {
         String password_aux = String.valueOf(password);
-        if (this.establecer_conexion("admin", password_aux)) {
+        if (this.establecer_conexion(admin, password_aux)) {
             return true;
         } else {
             return false;
@@ -47,7 +51,7 @@ public class Logica {
      * false en el caso contrario
      */
     public boolean conectar_empleado(String legajo_ingresado, char[] password) {
-        if (!this.establecer_conexion("empleado", "empleado")) {
+        if (!this.establecer_conexion(empleado, empleado)) {
             return false;
         } else {
         /* Una vez establecida la conexion con la base de datos se analiza
@@ -131,10 +135,8 @@ public class Logica {
      */
     private boolean establecer_conexion(String usuario, String password) {
         try {
-            System.out.println("Estableciendo conexión entre db");
             Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection(url, usuario, password);
-            System.out.println("Conexión establecida");
             return true;
         } catch (ClassNotFoundException e) {
             return false;
@@ -145,7 +147,6 @@ public class Logica {
 
     /**
      * Retorna todas las tablas de la base de datos
-     *
      * @return todas las tablas de la base de datos en uso
      */
     public Collection<String> get_tablas() {
@@ -169,7 +170,6 @@ public class Logica {
 
     /**
      * Retorna los atributos de una tabla
-     *
      * @param tabla tabla de la cual se retornaran los atributos
      * @return lista de atributos de la tabla pasada por parametro
      */
@@ -195,7 +195,6 @@ public class Logica {
 
     /**
      * Recibe una sentencia SQL del usuario e intenta ejecutarla
-     *
      * @param statement sentencia a ejecutarse
      * @return coleccion con datos de una consulta o null en caso de hacer un insert / update / create
      */
@@ -227,7 +226,6 @@ public class Logica {
 
     /**
      * Ejecuta una query recibida por parametro
-     *
      * @param query query a ejecutarse
      * @return conjunto de tablas y valores sobre los que se realizo la query
      * @throws SQLException caso de que la query posea algun error
@@ -265,7 +263,6 @@ public class Logica {
 
     /**
      * Calcula todas las ciudades de las que parte un vuelo
-     *
      * @return coleccion con las ciudades de las que parte un vuelo
      */
     public Collection<String> ciudades_origen() {
@@ -288,7 +285,6 @@ public class Logica {
 
     /**
      * Calcula todas las ciudades a las que llega un vuelo
-     *
      * @return coleccion con las ciudades de las que llega un vuelo
      */
     public Collection<String> ciudades_destino() {
@@ -310,8 +306,7 @@ public class Logica {
     }
 
     /**
-     * Retorna vuelo/s que van de ciudad_origen a ciudad_destino en la fecha pasaa por parametor
-     *
+     * Retorna vuelo/s que van de ciudad_origen a ciudad_destino en la fecha pasaa por parametro
      * @param ciudad_origen  ciudad de donde parte el vuelo
      * @param ciudad_destino ciudad a donde se dirige el vuelo
      * @param fecha          fecha en la que sale el vuelo
