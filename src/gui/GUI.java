@@ -102,6 +102,7 @@ public class GUI {
 
             }
         });
+
         idaVueltaCheckBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -125,6 +126,9 @@ public class GUI {
             }
         });
 
+
+        tableViajesVuelta.addMouseListener(new ElegirVueloListener(tableViajesVuelta, tableViajesVueltaModel));
+        tableViajesIda.addMouseListener(new ElegirVueloListener(tableViajesIda, tableViajesIdaModel));
 
     }
 
@@ -190,6 +194,11 @@ public class GUI {
     private void updateTable(DefaultTableModel model, Collection<Collection<String>> result) {
         model.setColumnCount(0);
         model.setRowCount(0);
+
+        if (model==null || result == null){
+            showMsg("error result es null o model es null");
+            return;
+        }
 
         Iterator<Collection<String>> iterator = result.iterator();
 
@@ -271,6 +280,13 @@ public class GUI {
                     frame.setSize(1920, 1080);
                     frame.setVisible(true);
                     frame.setContentPane(g.mainPanel);
+                    frame.addWindowListener(new WindowAdapter() {
+                        @Override
+                        public void windowClosing(WindowEvent e) {
+                            // aca llamo a logica.close o algo asi
+                            System.exit(0);
+                        }
+                    });
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -297,6 +313,25 @@ public class GUI {
 
         tableVueloElegidoModel = new DefaultTableModel();
         tableVueloElegido = new JTable(tableVueloElegidoModel);
+    }
+
+    //Este hay que borrarlo
+    Collection<Collection<String>> doSo(){return null;}
+
+    private class ElegirVueloListener extends MouseAdapter {
+        private DefaultTableModel myModel;
+        private JTable myTable;
+
+        public ElegirVueloListener(JTable myTable, DefaultTableModel myModel) {
+            this.myModel = myModel;
+            this.myTable = myTable;
+        }
+
+        public void mouseClicked(MouseEvent e) {
+            Collection<Collection<String>> res = doSo(); //logica. get info vuelo
+            updateTable(tableVueloElegidoModel, res);
+
+        }
     }
 
 
