@@ -35,7 +35,7 @@ public class Logica {
      */
     public boolean conectar_admin(char[] password) {
         String password_aux = String.valueOf(password);
-        if (this.establecer_conexion(admin, password_aux)) {
+        if (this.establecer_conexion("admin", password_aux)) {
             return true;
         } else {
             return false;
@@ -127,7 +127,7 @@ public class Logica {
         } catch (java.security.NoSuchAlgorithmException e) {
             System.out.println(e.getMessage());
         }
-        return null;
+        return "";
     }
 
     /**
@@ -137,6 +137,7 @@ public class Logica {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection(url, usuario, password);
+            System.out.println("conecte bien");
             return true;
         } catch (ClassNotFoundException e) {
             return false;
@@ -147,54 +148,49 @@ public class Logica {
 
     /**
      * Retorna todas las tablas de la base de datos
+     *
      * @return todas las tablas de la base de datos en uso
      */
-    public Collection<String> get_tablas() {
+    public Collection<String> get_tablas() throws SQLException {
         LinkedList<String> tablas = new LinkedList<String>();
-        try {
-            String query = "show tables";
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery(query);
-            String nombre_tabla;
-            while (rs.next()) {
-                nombre_tabla = rs.getString(1);
-                tablas.add(nombre_tabla);
-            }
-            rs.close();
-            st.close();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        String query = "show tables";
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery(query);
+        String nombre_tabla;
+        while (rs.next()) {
+            nombre_tabla = rs.getString(1);
+            tablas.add(nombre_tabla);
         }
+        rs.close();
+        st.close();
         return tablas;
     }
 
     /**
      * Retorna los atributos de una tabla
+     *
      * @param tabla tabla de la cual se retornaran los atributos
      * @return lista de atributos de la tabla pasada por parametro
      */
-    public Collection<String> get_atributos(String tabla) {
+    public Collection<String> get_atributos(String tabla) throws SQLException {
         LinkedList<String> atributos = new LinkedList<String>();
-        try {
-            String query = "describe " + tabla;
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery(query);
-            String nombre_atributo;
-            while (rs.next()) {
-                nombre_atributo = rs.getString(1);
-                atributos.add(nombre_atributo);
-            }
-            rs.close();
-            st.close();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        String query = "describe " + tabla;
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery(query);
+        String nombre_atributo;
+        while (rs.next()) {
+            nombre_atributo = rs.getString(1);
+            atributos.add(nombre_atributo);
         }
+        rs.close();
+        st.close();
         return atributos;
     }
 
 
     /**
      * Recibe una sentencia SQL del usuario e intenta ejecutarla
+     *
      * @param statement sentencia a ejecutarse
      * @return coleccion con datos de una consulta o null en caso de hacer un insert / update / create
      */
@@ -216,6 +212,7 @@ public class Logica {
 
     /**
      * Ejecuta un update/insert/delete o create sobre la base de datos
+     *
      * @param update sentencia a ejecutar
      * @throws SQLException excepcion en caso de sentencia invalida o dato ya creado
      */
@@ -226,6 +223,7 @@ public class Logica {
 
     /**
      * Ejecuta una query recibida por parametro
+     *
      * @param query query a ejecutarse
      * @return conjunto de tablas y valores sobre los que se realizo la query
      * @throws SQLException caso de que la query posea algun error
@@ -263,108 +261,90 @@ public class Logica {
 
     /**
      * Calcula todas las ciudades de las que parte un vuelo
+     *
      * @return coleccion con las ciudades de las que parte un vuelo
      */
-    public Collection<String> ciudades_origen() {
+    public Collection<String> ciudades_origen() throws SQLException {
         LinkedList<String> ciudades = new LinkedList<String>();
-        try {
-            String query = "select ciudad" +
-                    " from vuelos_programados join aeropuertos on aeropuerto_salida = codigo" +
-                    " group by ciudad";
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery(query);
-            while (rs.next()) {
-                ciudades.add(rs.getString(1));
-            }
-            st.close();
-            rs.close();
-        } catch (SQLException e) {
+        String query = "select ciudad" +
+                " from vuelos_programados join aeropuertos on aeropuerto_salida = codigo" +
+                " group by ciudad";
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery(query);
+        while (rs.next()) {
+            ciudades.add(rs.getString(1));
         }
+        st.close();
+        rs.close();
         return ciudades;
     }
 
     /**
      * Calcula todas las ciudades a las que llega un vuelo
+     *
      * @return coleccion con las ciudades de las que llega un vuelo
      */
-    public Collection<String> ciudades_destino() {
+    public Collection<String> ciudades_destino() throws SQLException {
         LinkedList<String> ciudades = new LinkedList<String>();
-        try {
-            String query = "select ciudad" +
-                    " from vuelos_programados join aeropuertos on aeropuerto_llegada = codigo" +
-                    " group by ciudad";
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery(query);
-            while (rs.next()) {
-                ciudades.add(rs.getString(1));
-            }
-            st.close();
-            rs.close();
-        } catch (SQLException e) {
+        String query = "select ciudad" +
+                " from vuelos_programados join aeropuertos on aeropuerto_llegada = codigo" +
+                " group by ciudad";
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery(query);
+        while (rs.next()) {
+            ciudades.add(rs.getString(1));
         }
+        st.close();
+        rs.close();
         return ciudades;
     }
 
     /**
      * Retorna vuelo/s que van de ciudad_origen a ciudad_destino en la fecha pasaa por parametro
+     *
      * @param ciudad_origen  ciudad de donde parte el vuelo
      * @param ciudad_destino ciudad a donde se dirige el vuelo
      * @param fecha          fecha en la que sale el vuelo
      * @return tabla que contiene el numero de vuelo, el aeropuerto de salida, la hora de salida, el aeropuerto de llegada
      * la hora de llegada, el modelo del avion y el tiempo estimado
      */
-    public Collection<Collection<String>> buscar_vuelos(String ciudad_origen, String ciudad_destino, Date fecha) {
+    public Collection<Collection<String>> buscar_vuelos(String ciudad_origen, String ciudad_destino, Date fecha) throws SQLException {
         Collection<Collection<String>> data = new LinkedList<>();
-        try {
-            Date fecha_sql = fechas.Fechas.convertirDateADateSQL(fecha);
-            String formato_devuelto = "'%d/%m/%Y'";
-            String query = " select vuelo, nombre_salida as aeropuerto_salida , hora_sale," +
-                    " aeropuerto_llegada, hora_llega, modelo_avion, tiempo_estimado, date_format(fecha, " + formato_devuelto +") as fecha" +
-                    " from vuelos_disponibles" +
-                    " where fecha = '" + fecha_sql + "' and ciudad_salida = '" + ciudad_origen + "' and ciudad_llegada = '" + ciudad_destino + "' " +
-                    " group by vuelo, aeropuerto_salida, hora_sale, aeropuerto_llegada, hora_llega, modelo_avion, tiempo_estimado";
-            data = this.ejecutar_query(query);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
+        Date fecha_sql = fechas.Fechas.convertirDateADateSQL(fecha);
+        String formato_devuelto = "'%d/%m/%Y'";
+        String query = " select vuelo, nombre_salida as aeropuerto_salida , hora_sale," +
+                " aeropuerto_llegada, hora_llega, modelo_avion, tiempo_estimado, date_format(fecha, " + formato_devuelto + ") as fecha" +
+                " from vuelos_disponibles" +
+                " where fecha = '" + fecha_sql + "' and ciudad_salida = '" + ciudad_origen + "' and ciudad_llegada = '" + ciudad_destino + "' " +
+                " group by vuelo, aeropuerto_salida, hora_sale, aeropuerto_llegada, hora_llega, modelo_avion, tiempo_estimado";
+        data = this.ejecutar_query(query);
         return data;
     }
 
     /**
      * Metodo que obtiene informacion de las clases, precios y asientos disponibles de un vuelo
+     *
      * @param num_vuelo numero del vuelo
-     * @param fecha fecha en la que es el vuelo
+     * @param fecha     fecha en la que es el vuelo
      * @return coleccion con la informacion de asientos disponibles, clases y precios del vuelo
      */
-    public Collection<Collection<String>> info_vuelo(int num_vuelo, Date fecha){
+    public Collection<Collection<String>> info_vuelo(int num_vuelo, Date fecha) throws SQLException {
         Collection<Collection<String>> data = new LinkedList<>();
-        try {
-            Date fecha_sql = fechas.Fechas.convertirDateADateSQL(fecha);
-            String query = "select clase, cant_libres as asientos_disponibles, precio" +
-                    " from vuelos_disponibles" +
-                    " where vuelo = " + num_vuelo + " and fecha = '" + fecha_sql + "'";
-            data = this.ejecutar_query(query);
-        }
-        catch(SQLException e){
-            System.out.println(e.getMessage());
-        }
+        Date fecha_sql = fechas.Fechas.convertirDateADateSQL(fecha);
+        String query = "select clase, cant_libres as asientos_disponibles, precio" +
+                " from vuelos_disponibles" +
+                " where vuelo = " + num_vuelo + " and fecha = '" + fecha_sql + "'";
+        data = this.ejecutar_query(query);
         return data;
     }
 
     /**
      * Metodo utilizado para finalizar la conexion con la base de datos
      */
-    public void shutdown(){
-        try {
-            if(con!= null && !con.isClosed()) {
-                con.close();
-            }
-        }
-        catch(SQLException e){
-            System.out.println(e.getMessage());
+    public void shutdown() throws SQLException {
+        if (con != null && !con.isClosed()) {
+            con.close();
         }
     }
-
-
 
 }
