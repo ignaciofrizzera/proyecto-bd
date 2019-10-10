@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.Iterator;
 
 public class GUI {
+    private final String MSG_ERROR_CONECTAR = "Error al conectar con la base datos";
     private JButton adminButton;
     private JButton userButton;
     private JPanel mainPanel;
@@ -98,7 +99,11 @@ public class GUI {
                 String selectedTable = tablesList.getSelectedValue();
 
                 atributeListModel.removeAllElements();
-                atributeListModel.addAll(logica.get_atributos(selectedTable));
+                try {
+                    atributeListModel.addAll(logica.get_atributos(selectedTable));
+                } catch (SQLException e) {
+                    showMsg(MSG_ERROR_CONECTAR);
+                }
 
             }
         });
@@ -158,28 +163,32 @@ public class GUI {
             showMsg("Fecha de ida inválida.");
             return;
         }
+        try {
+            fechaIda = Fechas.convertirStringADate(stringFechaIda);
+            Collection<Collection<String>> vuelosDisponiblesIda = logica.buscar_vuelos(ciudadOrigen, ciudadDestino, fechaIda);
+            tableViajesIda.setVisible(true);
+            updateTable(tableViajesIdaModel, vuelosDisponiblesIda);
 
-        fechaIda = Fechas.convertirStringADate(stringFechaIda);
-        Collection<Collection<String>> vuelosDisponiblesIda = logica.buscar_vuelos(ciudadOrigen, ciudadDestino, fechaIda);
-        tableViajesIda.setVisible(true);
-        updateTable(tableViajesIdaModel, vuelosDisponiblesIda);
+            if (idaVueltaCheckBox.isSelected()) {
+                diaVuelta = diaVueltaText.getText();
+                mesVuelta = mesVueltaText.getText();
+                añoVuelta = añoVueltaText.getText();
 
-        if (idaVueltaCheckBox.isSelected()) {
-            diaVuelta = diaVueltaText.getText();
-            mesVuelta = mesVueltaText.getText();
-            añoVuelta = añoVueltaText.getText();
+                stringFechaVuelta = diaVuelta + "/" + mesVuelta + "/" + añoVuelta;
 
-            stringFechaVuelta = diaVuelta + "/" + mesVuelta + "/" + añoVuelta;
+                if (!Fechas.validar(stringFechaVuelta)) {
+                    showMsg("Fecha de vuelta inválida.");
+                    return;
+                }
 
-            if (!Fechas.validar(stringFechaVuelta)) {
-                showMsg("Fecha de vuelta inválida.");
-                return;
+                fechaVuelta = Fechas.convertirStringADate(stringFechaVuelta);
+                Collection<Collection<String>> vuelosDisponiblesVuelta = logica.buscar_vuelos(ciudadDestino, ciudadOrigen, fechaVuelta);
+                tableViajesVuelta.setVisible(true);
+                updateTable(tableViajesVueltaModel, vuelosDisponiblesVuelta);
+
             }
-
-            fechaVuelta = Fechas.convertirStringADate(stringFechaVuelta);
-            Collection<Collection<String>> vuelosDisponiblesVuelta = logica.buscar_vuelos(ciudadDestino, ciudadOrigen, fechaVuelta);
-            tableViajesVuelta.setVisible(true);
-            updateTable(tableViajesVueltaModel, vuelosDisponiblesVuelta);
+        } catch (SQLException e) {
+            showMsg(MSG_ERROR_CONECTAR);
         }
     }
 
@@ -195,7 +204,7 @@ public class GUI {
         model.setColumnCount(0);
         model.setRowCount(0);
 
-        if (model==null || result == null){
+        if (model == null || result == null) {
             showMsg("Error result es null o model es null");
             return;
         }
@@ -244,10 +253,14 @@ public class GUI {
         adminButton.setVisible(false);
         panelAdmin.setVisible(true);
 
-        Collection<String> tablas = logica.get_tablas();
+        try {
+            Collection<String> tablas = logica.get_tablas();
 
-        for (String tabla : tablas) {
-            tablesListModel.addElement(tabla);
+            for (String tabla : tablas) {
+                tablesListModel.addElement(tabla);
+            }
+        } catch (SQLException e) {
+            showMsg(MSG_ERROR_CONECTAR);
         }
     }
 
@@ -257,15 +270,19 @@ public class GUI {
         panelUser.setVisible(true);
 
         Collection<String> ciudadesOrigen, ciudadesDestino;
-        ciudadesOrigen = logica.ciudades_origen();
-        ciudadesDestino = logica.ciudades_destino();
+        try {
+            ciudadesOrigen = logica.ciudades_origen();
+            ciudadesDestino = logica.ciudades_destino();
 
-        for (String ciudad : ciudadesOrigen) {
-            origenComboBox.addItem(ciudad);
-        }
+            for (String ciudad : ciudadesOrigen) {
+                origenComboBox.addItem(ciudad);
+            }
 
-        for (String ciudad : ciudadesDestino) {
-            destinoComboBox.addItem(ciudad);
+            for (String ciudad : ciudadesDestino) {
+                destinoComboBox.addItem(ciudad);
+            }
+        } catch (SQLException e) {
+            showMsg(MSG_ERROR_CONECTAR);
         }
 
     }
@@ -283,8 +300,13 @@ public class GUI {
                     frame.addWindowListener(new WindowAdapter() {
                         @Override
                         public void windowClosing(WindowEvent e) {
-                            logica.shutdown();
-                            System.exit(0);
+                            try {
+                                logica.shutdown();
+                            } catch (SQLException sqlE) {
+                            } finally {
+                                System.exit(0);
+
+                            }
                         }
                     });
                 } catch (Exception e) {
@@ -328,11 +350,14 @@ public class GUI {
             String stringVuelo = (String) myModel.getValueAt(myTable.getSelectedRow(), 0);
             int vuelo = Integer.parseInt(stringVuelo);
 
-            String datesString = (String) myModel.getValueAt(myTable.getSelectedRow(), myTable.getColumnCount()-1);
+            String datesString = (String) myModel.getValueAt(myTable.getSelectedRow(), myTable.getColumnCount() - 1);
             Date fecha = Fechas.convertirStringADate(datesString);
-
-            Collection<Collection<String>> res = logica.info_vuelo(vuelo, fecha);
-            updateTable(tableVueloElegidoModel, res);
+            try {
+                Collection<Collection<String>> res = logica.info_vuelo(vuelo, fecha);
+                updateTable(tableVueloElegidoModel, res);
+            } catch (SQLException ex) {
+                showMsg(MSG_ERROR_CONECTAR);
+            }
 
         }
     }

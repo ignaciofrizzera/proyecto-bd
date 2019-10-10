@@ -21,12 +21,6 @@ public class Logica {
 
 
     /**
-     * Main de testeo
-     */
-    public static void main(String[] args) {
-    }
-
-    /**
      * conexion del admin. a la base de datos
      *
      * @param password contraseña del administrador
