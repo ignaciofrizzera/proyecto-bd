@@ -207,6 +207,19 @@ CREATE TABLE reserva_vuelo_clase(
 	FOREIGN KEY (clase) references clases(nombre)
 ) ENGINE = InnoDB;
 
+CREATE TABLE asientos_reservados(
+	vuelo VARCHAR(45) NOT NULL,
+	fecha DATE NOT NULL,	
+	clase VARCHAR(45) NOT NULL,
+	cantidad INT UNSIGNED NOT NULL,
+	
+	CONSTRAINT fk_asientos_reservados_clase
+	FOREIGN KEY (clase) references clases(nombre),
+	
+	CONSTRAINT fk_asientos_reservados_fecha_vuelo
+	FOREIGN KEY(vuelo, fecha) references instancias_vuelo(vuelo, fecha)
+) ENGINE = InnoDB;
+
 #
 #	Creacion de vistas
 #
