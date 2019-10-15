@@ -2,15 +2,25 @@ package gui;
 
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.Date;
 
-public class DialogReservarVuelo extends JDialog {
+public class DialogReservarIda extends JDialog {
+    private final String ERROR_DNI= "El documento sólo puede contener números";
+
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JTextField numeroLabel;
-    private JTextField tipoLabel;
+    private JTextField tipoDocumentoText;
+    private JTextField numeroDocumentoText;
+    private Date fecha;
+    private String clase;
+    private int vuelo;
 
-    public DialogReservarVuelo() {
+    public DialogReservarIda(Date fecha, String clase, int vuelo) {
+        this.fecha = fecha;
+        this.clase = clase;
+        this.vuelo = vuelo;
+
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -44,12 +54,32 @@ public class DialogReservarVuelo extends JDialog {
     }
 
     private void onOK() {
-        // add your code here
-        dispose();
+        String tipoDocumento = tipoDocumentoText.getText();
+        String numeroDocumentoString = numeroDocumentoText.getText();
+
+        int numeroDocumento;
+        try {
+            numeroDocumento = Integer.parseInt(numeroDocumentoString);
+            //logica.reservar_ida(fecha, clase, vuelo, tipoDocumento, numeroDocumento)
+            dispose();
+        } catch (NumberFormatException e) {
+            showMsg(ERROR_DNI);
+        }
+
+
+
+    }
+    private void showMsg(String msg) {
+        DialogMsg dialog = new DialogMsg(msg);
+        dialog.pack();
+        dialog.setVisible(true);
+
     }
 
     private void onCancel() {
         // add your code here if necessary
         dispose();
     }
+
+
 }

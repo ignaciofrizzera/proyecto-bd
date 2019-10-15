@@ -1,20 +1,29 @@
 package gui;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
+import java.util.Date;
 
-public class DialogAdmin extends JDialog {
+public class DialogReservarIdaVuelta extends JDialog {
+    private final String ERROR_DNI= "El documento sólo puede contener números";
+
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JPasswordField passwordField;
-    private JLabel passwordLabel;
-    private JLabel errorLabel;
-    private GUI mainGUI;
+    private JTextField tipoDocumentoText;
+    private JTextField numeroDocumentoText;
+    private Date fechaIda, fechaVuelta;
+    private String claseIda, claseVuelta;
+    private int vueloIda, vueloVuelta;
 
-    public DialogAdmin(GUI mainGUI) {
-        this.mainGUI = mainGUI;
+    public DialogReservarIdaVuelta(Date fechaIda, String claseIda, int vueloIda, Date fechaVuelta, String claseVuelta, int vueloVuelta) {
+        this.fechaIda = fechaIda;
+        this.fechaVuelta = fechaVuelta;
+        this.claseIda = claseIda;
+        this.claseVuelta = claseVuelta;
+        this.vueloIda = vueloIda;
+        this.vueloVuelta = vueloVuelta;
+
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -48,14 +57,23 @@ public class DialogAdmin extends JDialog {
     }
 
     private void onOK() {
-        boolean conecto = mainGUI.connectAdmin(passwordField.getPassword());
-
-        if (!conecto) {
-            errorLabel.setVisible(true);
-        } else {
-            mainGUI.showAdmin();
+        String tipoDocumento = tipoDocumentoText.getText();
+        String numeroDocumentoString = numeroDocumentoText.getText();
+        int numeroDocumento;
+        try {
+            numeroDocumento = Integer.parseInt(numeroDocumentoString);
+            //logica.reservar_ida(fecha, clase, vuelo, tipoDocumento, numeroDocumento)
             dispose();
+        } catch (NumberFormatException e) {
+            showMsg(ERROR_DNI);
         }
+    }
+
+    private void showMsg(String msg) {
+        DialogMsg dialog = new DialogMsg(msg);
+        dialog.pack();
+        dialog.setVisible(true);
+
     }
 
     private void onCancel() {

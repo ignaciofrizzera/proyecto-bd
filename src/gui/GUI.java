@@ -4,6 +4,7 @@ import fechas.Fechas;
 import logica.Logica;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
@@ -14,6 +15,7 @@ import java.util.Iterator;
 
 public class GUI {
     private final String MSG_ERROR_CONECTAR = "Error al conectar con la base datos";
+    private final String MSG_ERROR_ELEGIR_RESERVA = "Error, debe elegir el/los vuelo/s y clase/s para reservar";
 
     private static Logica logica;
 
@@ -22,7 +24,7 @@ public class GUI {
     private JPanel mainPanel;
     private JTextArea textSQL;
     private JTable valuesTable;
-    private javax.swing.JPanel panelAdmin;
+    private JPanel panelAdmin;
     private JPanel panelUser;
     private JLabel ciudadOrigen;
     private JComboBox origenComboBox;
@@ -139,6 +141,11 @@ public class GUI {
                 tableVueloElegidoVueltaModel.setColumnCount(0);
                 tableVueloElegidoVueltaModel.setRowCount(0);
 
+                if (!idaVueltaCheckBox.isSelected()){
+                    tableViajesVueltaModel.setColumnCount(0);
+                    tableViajesVueltaModel.setRowCount(0);
+                }
+
             }
         });
 
@@ -149,7 +156,58 @@ public class GUI {
         reservarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                
+                if (idaVueltaCheckBox.isSelected()) {
+                    reservarVuelta();
+                } else {
+                    reservarIda();
+                }
+            }
+
+            private void reservarIda() {
+                if (tableViajesIda.getSelectedRow() == -1 || tableVueloElegidoIda.getSelectedRow() == -1) {
+                    showMsg(MSG_ERROR_ELEGIR_RESERVA);
+                } else {
+                    String stringVuelo = (String) tableViajesIdaModel.getValueAt(tableViajesIda.getSelectedRow(), 0);
+                    int vuelo = Integer.parseInt(stringVuelo);
+
+                    String datesString = (String) tableViajesIdaModel.getValueAt(tableViajesIda.getSelectedRow(), tableViajesIda.getColumnCount() - 1);
+                    Date fecha = Fechas.convertirStringADate(datesString);
+
+                    String clase = (String) tableVueloElegidoIdaModel.getValueAt(tableVueloElegidoIda.getSelectedRow(), 0);
+
+                    DialogReservarIda dialog = new DialogReservarIda(fecha, clase, vuelo);
+                    dialog.pack();
+                    dialog.setVisible(true);
+                }
+
+            }
+
+            private void reservarVuelta() {
+                if (tableViajesIda.getSelectedRow() == -1 || tableVueloElegidoIda.getSelectedRow() == -1 ||
+                        tableViajesVuelta.getSelectedRow() == -1 || tableVueloElegidoVuelta.getSelectedRow() == -1) {
+                    showMsg(MSG_ERROR_ELEGIR_RESERVA);
+                } else {
+                    String stringVueloIda = (String) tableViajesIdaModel.getValueAt(tableViajesIda.getSelectedRow(), 0);
+                    int vueloIda = Integer.parseInt(stringVueloIda);
+
+                    String dateIdaString = (String) tableViajesIdaModel.getValueAt(tableViajesIda.getSelectedRow(), tableViajesIda.getColumnCount() - 1);
+                    Date fechaIda = Fechas.convertirStringADate(dateIdaString);
+
+                    String claseIda = (String) tableVueloElegidoIdaModel.getValueAt(tableVueloElegidoIda.getSelectedRow(), 0);
+
+                    String stringVueloVuelta = (String) tableViajesIdaModel.getValueAt(tableViajesIda.getSelectedRow(), 0);
+                    int vueloVuelta = Integer.parseInt(stringVueloVuelta);
+
+                    String dateStringVuelta = (String) tableViajesIdaModel.getValueAt(tableViajesIda.getSelectedRow(), tableViajesIda.getColumnCount() - 1);
+                    Date fechaVuelta = Fechas.convertirStringADate(dateStringVuelta);
+
+                    String claseVuelta = (String) tableVueloElegidoIdaModel.getValueAt(tableVueloElegidoIda.getSelectedRow(), 0);
+
+                    DialogReservarIdaVuelta dialog = new DialogReservarIdaVuelta(fechaIda, claseIda, vueloIda, fechaVuelta, claseVuelta, vueloVuelta);
+                    dialog.pack();
+                    dialog.setVisible(true);
+
+                }
             }
         });
     }
@@ -354,7 +412,7 @@ public class GUI {
         tableVueloElegidoIda = new JTable(tableVueloElegidoIdaModel);
 
         tableVueloElegidoVueltaModel = new DefaultTableModel();
-        tableVueloElegidoVuelta= new JTable(tableVueloElegidoVueltaModel);
+        tableVueloElegidoVuelta = new JTable(tableVueloElegidoVueltaModel);
     }
 
     private class ElegirVueloListener extends MouseAdapter {
