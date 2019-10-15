@@ -14,6 +14,9 @@ import java.util.Iterator;
 
 public class GUI {
     private final String MSG_ERROR_CONECTAR = "Error al conectar con la base datos";
+
+    private static Logica logica;
+
     private JButton adminButton;
     private JButton userButton;
     private JPanel mainPanel;
@@ -41,15 +44,16 @@ public class GUI {
     private JPanel panelCiudades;
     private JButton buscarVuelosButton;
     private JTable tableViajesVuelta;
-    private JTable tableVueloElegido;
+    private JTable tableVueloElegidoIda;
+    private JTable tableVueloElegidoVuelta;
+    private JButton reservarButton;
     private DefaultListModel<String> tablesListModel;
     private DefaultListModel<String> atributeListModel;
     private DefaultTableModel tableViajesIdaModel;
     private DefaultTableModel valuesTableModel;
     private DefaultTableModel tableViajesVueltaModel;
-    private DefaultTableModel tableVueloElegidoModel;
-
-    private static Logica logica;
+    private DefaultTableModel tableVueloElegidoIdaModel;
+    private DefaultTableModel tableVueloElegidoVueltaModel;
 
     public GUI() {
         GUI myGUI = this;
@@ -128,13 +132,26 @@ public class GUI {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 buscarVuelos();
+
+                tableVueloElegidoIdaModel.setColumnCount(0);
+                tableVueloElegidoIdaModel.setRowCount(0);
+
+                tableVueloElegidoVueltaModel.setColumnCount(0);
+                tableVueloElegidoVueltaModel.setRowCount(0);
+
             }
         });
 
 
-        tableViajesVuelta.addMouseListener(new ElegirVueloListener(tableViajesVuelta, tableViajesVueltaModel));
-        tableViajesIda.addMouseListener(new ElegirVueloListener(tableViajesIda, tableViajesIdaModel));
+        tableViajesVuelta.addMouseListener(new ElegirVueloListener(tableViajesVuelta, tableViajesVueltaModel, tableVueloElegidoVueltaModel));
+        tableViajesIda.addMouseListener(new ElegirVueloListener(tableViajesIda, tableViajesIdaModel, tableVueloElegidoIdaModel));
 
+        reservarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                
+            }
+        });
     }
 
     private void buscarVuelos() {
@@ -333,17 +350,21 @@ public class GUI {
         tableViajesVueltaModel = new DefaultTableModel();
         tableViajesVuelta = new JTable(tableViajesVueltaModel);
 
-        tableVueloElegidoModel = new DefaultTableModel();
-        tableVueloElegido = new JTable(tableVueloElegidoModel);
+        tableVueloElegidoIdaModel = new DefaultTableModel();
+        tableVueloElegidoIda = new JTable(tableVueloElegidoIdaModel);
+
+        tableVueloElegidoVueltaModel = new DefaultTableModel();
+        tableVueloElegidoVuelta= new JTable(tableVueloElegidoVueltaModel);
     }
 
     private class ElegirVueloListener extends MouseAdapter {
-        private DefaultTableModel myModel;
+        private DefaultTableModel myModel, targetModel;
         private JTable myTable;
 
-        public ElegirVueloListener(JTable myTable, DefaultTableModel myModel) {
+        public ElegirVueloListener(JTable myTable, DefaultTableModel myModel, DefaultTableModel targetModel) {
             this.myModel = myModel;
             this.myTable = myTable;
+            this.targetModel = targetModel;
         }
 
         public void mouseClicked(MouseEvent e) {
@@ -354,7 +375,7 @@ public class GUI {
             Date fecha = Fechas.convertirStringADate(datesString);
             try {
                 Collection<Collection<String>> res = logica.info_vuelo(vuelo, fecha);
-                updateTable(tableVueloElegidoModel, res);
+                updateTable(targetModel, res);
             } catch (SQLException ex) {
                 showMsg(MSG_ERROR_CONECTAR);
             }

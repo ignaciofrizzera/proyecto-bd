@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="gui.GUI">
   <grid id="27dc6" binding="mainPanel" layout-manager="FlowLayout" hgap="0" vgap="0" flow-align="1">
     <constraints>
-      <xy x="462" y="20" width="1203" height="1230"/>
+      <xy x="23" y="21" width="1203" height="1230"/>
     </constraints>
     <properties>
       <font/>
@@ -18,7 +18,7 @@
           <verifyInputWhenFocusTarget value="false"/>
           <verticalAlignment value="1"/>
           <verticalTextPosition value="0"/>
-          <visible value="true"/>
+          <visible value="false"/>
         </properties>
       </component>
       <grid id="109cc" binding="panelAdmin" layout-manager="GridLayoutManager" row-count="4" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -107,14 +107,14 @@
         <constraints/>
         <properties>
           <text value="Admin"/>
-          <visible value="true"/>
+          <visible value="false"/>
         </properties>
       </component>
       <grid id="df213" binding="panelUser" layout-manager="GridLayoutManager" row-count="5" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints/>
         <properties>
-          <visible value="false"/>
+          <visible value="true"/>
         </properties>
         <border type="none"/>
         <children>
@@ -327,7 +327,7 @@
                   <text value=""/>
                 </properties>
               </component>
-              <component id="9fe9d" class="javax.swing.JButton" binding="buscarVuelosButton" default-binding="true">
+              <component id="9fe9d" class="javax.swing.JButton" binding="reservarButt">
                 <constraints>
                   <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -358,24 +358,52 @@
               </component>
             </children>
           </scrollpane>
-          <scrollpane id="3b5fd">
+          <grid id="8355c" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
-              <grid row="4" column="0" row-span="1" col-span="2" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                <preferred-size width="-1" height="300"/>
-                <maximum-size width="-1" height="300"/>
-              </grid>
+              <grid row="4" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="7" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties/>
-            <border type="line" title="Info de vuelo" title-justification="2"/>
+            <border type="none"/>
             <children>
-              <component id="c0907" class="javax.swing.JTable" binding="tableVueloElegido" custom-create="true">
-                <constraints/>
-                <properties>
-                  <autoCreateRowSorter value="false"/>
-                </properties>
-              </component>
+              <scrollpane id="3b5fd">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+                <border type="line" title="Info de vuelo de ida" title-justification="2"/>
+                <children>
+                  <component id="c0907" class="javax.swing.JTable" binding="tableVueloElegidoIda" custom-create="true">
+                    <constraints/>
+                    <properties>
+                      <autoCreateRowSorter value="false"/>
+                    </properties>
+                  </component>
+                </children>
+              </scrollpane>
+              <scrollpane id="283c4">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+                <border type="line" title="Info de vuelo de vuelta" title-justification="2"/>
+                <children>
+                  <component id="293d5" class="javax.swing.JTable" binding="tableVueloElegidoVuelta" custom-create="true">
+                    <constraints/>
+                    <properties/>
+                  </component>
+                </children>
+              </scrollpane>
             </children>
-          </scrollpane>
+          </grid>
+          <component id="197e0" class="javax.swing.JButton" binding="reservarButton">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Reservar"/>
+            </properties>
+          </component>
         </children>
       </grid>
     </children>
