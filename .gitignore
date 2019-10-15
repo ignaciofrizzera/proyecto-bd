@@ -15,3 +15,6 @@ out/production/proyecto-bd/gui/GUI$1.class
 src/main/resources/META-INF/MANIFEST.MF
 proyectobd.properties
 out/production/proyecto-bd/main/resources/META-INF/MANIFEST.MF
+src/META-INF/MANIFEST.MF
+out/artifacts/proyecto_bd_jar/proyecto-bd.jar
+out/production/proyecto-bd/META-INF/MANIFEST.MF
