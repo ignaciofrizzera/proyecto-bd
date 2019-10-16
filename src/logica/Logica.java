@@ -16,9 +16,23 @@ public class Logica {
     private final String empleado = "empleado";
     private final String url = "jdbc:mysql://" + server + "/" + base_datos +
             "?serverTimezone=America/Argentina/Buenos_Aires";
-
+    private int legajo_empleado; //Legajo del empleado que ha iniciado sesión.
     private Connection con;
 
+    public static void main(String[] args) {
+        Logica logica = new Logica();
+        try {
+            if (logica.establecer_conexion("admin", "admin")) {
+                System.out.println("aca conecte");
+                Date d = new Date();
+                String aux = logica.reservar_ida(d, "clase", "15", " ", 15);
+                System.out.println("aux");
+            } else
+                System.out.println("no");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * conexion del admin. a la base de datos
@@ -52,7 +66,7 @@ public class Logica {
            si el usuario esta en esta
         */
             try {
-                int legajo_aux = Integer.parseInt(legajo_ingresado);
+                legajo_empleado = Integer.parseInt(legajo_ingresado);
                 String password_aux = String.valueOf(password);
                 String query = "select legajo from empleados";
                 Statement st = con.createStatement();
@@ -63,7 +77,7 @@ public class Logica {
                 //Se analiza legajo ingresado
                 while (rs.next()) {
                     legajo = rs.getInt(1);
-                    if (legajo == legajo_aux) {
+                    if (legajo == legajo_empleado) {
                         existe = true;
                         break;
                     }
@@ -75,7 +89,7 @@ public class Logica {
                     con.close();
                     return false;
                 } else {
-                    query = "select password from empleados where legajo = " + legajo_aux;
+                    query = "select password from empleados where legajo = " + legajo_empleado;
                     rs = st.executeQuery(query);
                     String aux = null;
                     if (rs.next()) {
@@ -131,7 +145,6 @@ public class Logica {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection(url, usuario, password);
-            System.out.println("conecte bien");
             return true;
         } catch (ClassNotFoundException e) {
             return false;
@@ -333,6 +346,51 @@ public class Logica {
     }
 
     /**
+     * Intenta realizar una reserva de ida en base a los parametros ingresados
+     * @param fecha fecha de un vuelo a reservar
+     * @param clase clase de un vuelo a reservar
+     * @param vuelo id de un vuelo a reservar
+     * @param tipo_doc tipo de documento de la persona que está reservando
+     * @param num_doc numero de documento de la persona que está reseservando
+     * @return devuelve un String con el mensaje de error o éxito
+     * @throws SQLException en el caso de perder la conexión con la bd a mitad de ejecución u otro inconveniente.
+     */
+    public String reservar_ida(Date fecha, String clase, String vuelo, String tipo_doc, int num_doc) throws SQLException {
+        /*Verificar que los datos pertenezcan a la base de datos*/
+        Date fecha_sql = fechas.Fechas.convertirDateADateSQL(fecha);
+        String query = "select * from instancias_vuelo where numero = " + vuelo + "and fecha = '" + fecha_sql + "'";
+        Statement st = con.createStatement();
+        ResultSet rst = st.executeQuery(query);
+        /*Asumo que se quiere ver por un vuelo X que salga el dia Y entonces verifico en la tabla instancias_vuelo*/
+        if (!rst.next())
+            return "El vuelo y la fecha ingresados no están en la base de datos.";
+
+        query = "select * from clases where nombre = " + clase;
+        rst = st.executeQuery(query);
+        if (!rst.next())
+            return "La clase ingresada no está en la base de datos.";
+
+        query = "select * from pasajeros where doc_tipo = " + tipo_doc + " and doc_nro = " + num_doc;
+        rst = st.executeQuery(query);
+        if (!rst.next())
+            return "La persona que desea realizar la reserva no se encuentra en la base de datos.";
+
+        query = "{call realizar_reserva_ida(?, ?, ?, ?, ?, ?, ?)}";
+        CallableStatement cst = con.prepareCall(query);
+        cst.setString(1, vuelo);
+        //TODO VER FORMATO DE LA FECHA - cst.setDate(2, NULL);
+        cst.setString(3, clase);
+        cst.setString(4, tipo_doc);
+        cst.setInt(5, num_doc);
+        cst.setInt(6, legajo_empleado);
+
+        /*Ver bien esto - el rst en 1 debería devolver el mensaje de error/bien del procedure*/
+        rst = cst.executeQuery();
+        return rst.getString(1);
+    }
+
+
+    /**
      * Metodo utilizado para finalizar la conexion con la base de datos
      */
     public void shutdown() throws SQLException {
@@ -340,5 +398,6 @@ public class Logica {
             con.close();
         }
     }
+
 
 }
