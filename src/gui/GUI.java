@@ -106,7 +106,9 @@ public class GUI {
 
                 atributeListModel.removeAllElements();
                 try {
-                    atributeListModel.addAll(logica.get_atributos(selectedTable));
+                    for (String s : logica.get_atributos(selectedTable)) {
+                        atributeListModel.addElement(s);
+                    }
                 } catch (SQLException e) {
                     showMsg(MSG_ERROR_CONECTAR);
                 }
@@ -141,7 +143,7 @@ public class GUI {
                 tableVueloElegidoVueltaModel.setColumnCount(0);
                 tableVueloElegidoVueltaModel.setRowCount(0);
 
-                if (!idaVueltaCheckBox.isSelected()){
+                if (!idaVueltaCheckBox.isSelected()) {
                     tableViajesVueltaModel.setColumnCount(0);
                     tableViajesVueltaModel.setRowCount(0);
                 }
