@@ -331,62 +331,88 @@ DELIMITER ! # delimitiador a usar para los procedures
 #tipo y numero doc del pasajero - 	doc_tipo VARCHAR(10) - doc_nro INT(10) UNSIGNED,
 #legajo del empleado que gestiona la reserva - 	legajo INT(10) UNSIGNED NOT NULL,
 CREATE PROCEDURE realizar_reserva_ida(IN id_vuelo VARCHAR(45), IN fecha_vuelo DATE, IN clase_vuelo VARCHAR(45), IN tipo_doc VARCHAR(10),
-									  IN nro_doc INT(10) UNSIGNED, IN legajo_emp INT(10) UNSIGNED, OUT res VARCHAR(45))
+									  IN nro_doc INT(10) UNSIGNED, IN legajo_emp INT(10) UNSIGNED, OUT res VARCHAR(100))
 	BEGIN
-		/*Verificar datos?*/
+		/*Verificar datos*/
 		# Casos donde los datos no existan
-		DECLARE row_count_vuelos INT;
+		DECLARE row_count INT;
 		
-		SET row_count = (SELECT count(*) from vuelos_disponibles);
-		
-		IF (row_count<=0) THEN 
+		SET row_count = (SELECT count(*) FROM vuelos_disponibles WHERE id_vuelo = vuelo AND fecha = fecha_vuelo AND clase = clase_vuelo);
+
+		IF (row_count = 0) THEN /*Caso que el vuelo con la fecha y clase no existan en la b.d*/
 			SET res = 'No hay asientos disponibles para realizar la reserva';
 		ELSE BEGIN
-		
-			DECLARE cant_reservados INT;
-			DECLARE cant_disponibles INT;
-			DECLARE asientos_cant INT;
-		
-			SELECT cant_libres INTO cant_disponibles FROM vuelos_disponibles WHERE vuelo = id_vuelo AND fecha_vuelo = fecha AND clase_vuelo = clase;
-			SELECT cant_asientos INTO asientos_cant FROM vuelos_disponibles WHERE vuelo = id_vuelo AND fecha_vuelo = fecha AND clase_vuelo = clase;
-			SELECT cantidad INTO cant_reservados FROM asientos_reservados WHERE vuelo = id_vuelo AND fecha_vuelo = fecha AND clase_vuelo = clase;
-		
-			IF(cant_reservados < cant_disponibles) THEN # Caso que se puede realizar una reserva
-			BEGIN 
-				DECLARE id_nueva_reserva INT;
-				DECLARE fecha_reserva DATE;
-				DECLARE fecha_vencimiento DATE;
-				DECLARE estado_res VARCHAR(45);
-				
-				SELECT curdate() INTO fecha_reserva;
-				SELECT subdate(fecha_vuelo, INTERVAL 15 DAY) INTO fecha_vencimiento;
-				SELECT last_insert_id() INTO id_nueva_reserva;
-			
-				IF (cant_reservados < asientos_cant) THEN
-					SET estado_res = 'confirmada';
-				ELSE
-					SET estado_res = 'en espera';
-				END IF;
-				
-				# Se inserta la reserva en la BD
-				INSERT INTO reservas(numero,fecha, vencimiento, estado, doc_tipo, doc_nro, legajo) VALUES(id_nueva_reserva, fecha_reserva, fecha_vencimiento, estado_res, tipo_doc, nro_doc, legajo_emp);
-					
-				# Se inserta en reserva_vuelo_clase
-				INSERT INTO reserva_vuelo_clase(numero, vuelo, fecha_vuelo, clase) VALUES(id_nueva_reserva, id_vuelo, fecha_vuelo, clase_vuelo);
-				
-				# Se aumenta la cantidad de asientos reservados
-				SET cant_reservados = cant_reservados + 1;
-				UPDATE asientos_reservados SET cantidad = cant_reservados WHERE vuelo = id_vuelo AND fecha = fecha_vuelo AND clase = clase_vuelo;
-				
-				SET res = 'Se pudo realizar la reserva con exito';	
-			END;
-			ELSE 
-				SET res = 'No hay asientos disponibles para realizar la reserva';
-			END IF;
+				 SET row_count = (SELECT count(*) FROM pasajeros WHERE doc_tipo = tipo_doc AND nro_doc = doc_nro);
+				 IF (row_count = 0) THEN /*Caso que la persona que desea realizar la reserva no este en la b.d*/
+				 	SET res = 'No existe la persona que desea realizar la reserva en la base de datos';
+				 ELSE BEGIN
+					 	  SET row_count = (SELECT count(*) from empleados where legajo_emp = legajo);
+						  IF (row_count = 0) THEN /*Caso que el empleado que va a manejar la reserva no este en la b.d*/
+						  	SET res = 'No existe el empleado que debe atender la reserva en la base de datos';
+						  ELSE BEGIN /*Caso que los datos sean validos se procede a realizar la reserva*/
+							  	   SET row_count = (SELECT count(*) FROM asientos_reservados);
+							  	   IF(row_count = 0) THEN /*Caso que no se haya realizado ninguna reserva la tabla estara vacia*/
+							  	   		CALL realizar_reserva_ida_aux(id_vuelo,fecha_vuelo,clase_vuelo,tipo_doc,nro_doc,legajo_emp,res);
+							  	   ELSE BEGIN  
+								  	   DECLARE cant_reservados INT;
+									   DECLARE cant_disponibles INT;
+									   
+									   SELECT cant_libres INTO cant_disponibles FROM vuelos_disponibles WHERE vuelo = id_vuelo AND fecha_vuelo = fecha AND clase_vuelo = clase;
+									   SELECT cantidad INTO cant_reservados FROM asientos_reservados WHERE vuelo = id_vuelo AND fecha_vuelo = fecha AND clase_vuelo = clase;
+									   IF(cant_reservados < cant_disponibles) THEN # Caso que se puede realizar una reserva
+											CALL realizar_reserva_ida_aux(id_vuelo,fecha_vuelo,clase_vuelo,tipo_doc,nro_doc,legajo_emp,res);
+									   ELSE
+									  	SET res = 'No hay asientos disponibles para realizar la reserva';
+						  			  END IF;
+						  			END;
+						  		 	END IF;
+						  	 	END;
+						  	 	END IF;
+						  	 END;
+						  	 END IF;
 		END;
 		END IF;
+	END
+	!
+
+	
+CREATE PROCEDURE realizar_reserva_ida_aux(IN id_vuelo VARCHAR(45), IN fecha_vuelo DATE, IN clase_vuelo VARCHAR(45), IN tipo_doc VARCHAR(10),
+									  IN nro_doc INT(10) UNSIGNED, IN legajo_emp INT(10) UNSIGNED, OUT res VARCHAR(100))
+	BEGIN
+		DECLARE cant_reservados INT;
+		DECLARE cant_disponibles INT;
+		DECLARE asientos_cant INT;
 		
-	END;
-!
+		DECLARE id_nueva_reserva INT;
+		DECLARE fecha_reserva DATE;
+		DECLARE fecha_vencimiento DATE;
+		DECLARE estado_res VARCHAR(45);
+		
+		SELECT cant_libres INTO cant_disponibles FROM vuelos_disponibles WHERE vuelo = id_vuelo AND fecha_vuelo = fecha AND clase_vuelo = clase;
+		SELECT cant_asientos INTO asientos_cant FROM vuelos_disponibles WHERE vuelo = id_vuelo AND fecha_vuelo = fecha AND clase_vuelo = clase;
+		SELECT cantidad INTO cant_reservados FROM asientos_reservados WHERE vuelo = id_vuelo AND fecha_vuelo = fecha AND clase_vuelo = clase;
+											
+		SELECT curdate() INTO fecha_reserva;
+		SELECT subdate(fecha_vuelo, INTERVAL 15 DAY) INTO fecha_vencimiento;
+		SELECT last_insert_id() INTO id_nueva_reserva;
+										
+		IF (cant_reservados < asientos_cant) THEN
+			SET estado_res = 'confirmada';
+		ELSE
+			SET estado_res = 'en espera';
+		END IF;
+											
+		# Se inserta la reserva en la BD
+		INSERT INTO reservas(numero,fecha, vencimiento, estado, doc_tipo, doc_nro, legajo) VALUES(id_nueva_reserva, fecha_reserva, fecha_vencimiento, estado_res, tipo_doc, nro_doc, legajo_emp);
+		# Se inserta en reserva_vuelo_clase
+		INSERT INTO reserva_vuelo_clase(numero, vuelo, fecha_vuelo, clase) VALUES(id_nueva_reserva, id_vuelo, fecha_vuelo, clase_vuelo);										
+		# Se aumenta la cantidad de asientos reservados
+		SET cant_reservados = cant_reservados + 1;
+		UPDATE asientos_reservados SET cantidad = cant_reservados WHERE vuelo = id_vuelo AND fecha = fecha_vuelo AND clase = clase_vuelo;
+											
+		SET res = 'Se pudo realizar la reserva con exito';					
+	END
+	!
+									  
 
 DELIMITER ; # una vez creados los procedures se vuelve a establecer ; como delimitador

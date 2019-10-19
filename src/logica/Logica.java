@@ -358,22 +358,8 @@ public class Logica {
     public String reservar_ida(Date fecha, String clase, String vuelo, String tipo_doc, int num_doc) throws SQLException {
         /*Verificar que los datos pertenezcan a la base de datos*/
         Date fecha_sql = fechas.Fechas.convertirDateADateSQL(fecha);
-        String query = "select * from instancias_vuelo where numero = " + vuelo + "and fecha = '" + fecha_sql + "'";
-        Statement st = con.createStatement();
-        ResultSet rst = st.executeQuery(query);
-        /*Asumo que se quiere ver por un vuelo X que salga el dia Y entonces verifico en la tabla instancias_vuelo*/
-        if (!rst.next())
-            return "El vuelo y la fecha ingresados no están en la base de datos.";
-
-        query = "select * from clases where nombre = " + clase;
-        rst = st.executeQuery(query);
-        if (!rst.next())
-            return "La clase ingresada no está en la base de datos.";
-
-        query = "select * from pasajeros where doc_tipo = " + tipo_doc + " and doc_nro = " + num_doc;
-        rst = st.executeQuery(query);
-        if (!rst.next())
-            return "La persona que desea realizar la reserva no se encuentra en la base de datos.";
+        String query;
+        ResultSet rst;
 
         query = "{call realizar_reserva_ida(?, ?, ?, ?, ?, ?, ?)}";
         CallableStatement cst = con.prepareCall(query);
@@ -386,7 +372,10 @@ public class Logica {
 
         /*Ver bien esto - el rst en 1 debería devolver el mensaje de error/bien del procedure*/
         rst = cst.executeQuery();
-        return rst.getString(1);
+
+        String mensaje = rst.getString(1);
+        rst.close();
+        return mensaje;
     }
 
 
