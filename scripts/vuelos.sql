@@ -316,7 +316,6 @@ GRANT DELETE, INSERT, UPDATE ON vuelos.reservas TO 'empleado'@'%';
 GRANT DELETE, INSERT, UPDATE ON vuelos.pasajeros TO 'empleado'@'%';
 GRANT DELETE, INSERT, UPDATE ON vuelos.reserva_vuelo_clase TO 'empleado'@'%';
 
-
 CREATE USER 'cliente'@'%' IDENTIFIED BY 'cliente';
 GRANT SELECT ON vuelos.vuelos_disponibles TO 'cliente'@'%';
 */
@@ -376,7 +375,7 @@ CREATE PROCEDURE realizar_reserva_ida(IN id_vuelo VARCHAR(45), IN fecha_vuelo DA
 	!
 
 	
-CREATE PROCEDURE realizar_reserva_ida_aux(IN id_vuelo VARCHAR(45), IN fecha_vuelo DATE, IN clase_vuelo VARCHAR(45), IN tipo_doc VARCHAR(10),
+CREATE PROCEDURE realizar_reserva_ida_aux(IN id_vuelo VARCHAR(45), IN vuelo_fecha DATE, IN clase_vuelo VARCHAR(45), IN tipo_doc VARCHAR(10),
 									  IN nro_doc INT(10) UNSIGNED, IN legajo_emp INT(10) UNSIGNED, OUT res VARCHAR(100))
 	BEGIN
 		DECLARE cant_reservados INT;
@@ -387,15 +386,20 @@ CREATE PROCEDURE realizar_reserva_ida_aux(IN id_vuelo VARCHAR(45), IN fecha_vuel
 		DECLARE fecha_reserva DATE;
 		DECLARE fecha_vencimiento DATE;
 		DECLARE estado_res VARCHAR(45);
-		
-		SELECT cant_libres INTO cant_disponibles FROM vuelos_disponibles WHERE vuelo = id_vuelo AND fecha_vuelo = fecha AND clase_vuelo = clase;
-		SELECT cant_asientos INTO asientos_cant FROM vuelos_disponibles WHERE vuelo = id_vuelo AND fecha_vuelo = fecha AND clase_vuelo = clase;
-		SELECT cantidad INTO cant_reservados FROM asientos_reservados WHERE vuelo = id_vuelo AND fecha_vuelo = fecha AND clase_vuelo = clase;
+				
+		SELECT cant_libres INTO cant_disponibles FROM vuelos_disponibles WHERE vuelo = id_vuelo AND vuelo_fecha = fecha AND clase_vuelo = clase;
+		SELECT cant_asientos INTO asientos_cant FROM vuelos_disponibles WHERE vuelo = id_vuelo AND vuelo_fecha = fecha AND clase_vuelo = clase;
+	
+		SET cant_reservados = (SELECT count(*) FROM asientos_reservados WHERE vuelo = id_vuelo AND vuelo_fecha = fecha AND clase_vuelo = clase);
+		if(cant_reservados = 0) THEN
+			SET cant_reservados = 0;
+		ELSE
+			SELECT cantidad INTO cant_reservados FROM asientos_reservados WHERE vuelo = id_vuelo AND vuelo_fecha = fecha AND clase_vuelo = clase;
+		END IF;
 											
 		SELECT curdate() INTO fecha_reserva;
-		SELECT subdate(fecha_vuelo, INTERVAL 15 DAY) INTO fecha_vencimiento;
-		SELECT last_insert_id() INTO id_nueva_reserva;
-										
+		SELECT subdate(vuelo_fecha, INTERVAL 15 DAY) INTO fecha_vencimiento;
+											
 		IF (cant_reservados < asientos_cant) THEN
 			SET estado_res = 'confirmada';
 		ELSE
@@ -403,16 +407,29 @@ CREATE PROCEDURE realizar_reserva_ida_aux(IN id_vuelo VARCHAR(45), IN fecha_vuel
 		END IF;
 											
 		# Se inserta la reserva en la BD
-		INSERT INTO reservas(numero,fecha, vencimiento, estado, doc_tipo, doc_nro, legajo) VALUES(id_nueva_reserva, fecha_reserva, fecha_vencimiento, estado_res, tipo_doc, nro_doc, legajo_emp);
+		INSERT INTO reservas(fecha, vencimiento, estado, doc_tipo, doc_nro, legajo) VALUES(fecha_reserva, fecha_vencimiento, estado_res, tipo_doc, nro_doc, legajo_emp);
+
+		SELECT last_insert_id() INTO id_nueva_reserva;
+	
 		# Se inserta en reserva_vuelo_clase
-		INSERT INTO reserva_vuelo_clase(numero, vuelo, fecha_vuelo, clase) VALUES(id_nueva_reserva, id_vuelo, fecha_vuelo, clase_vuelo);										
+		INSERT INTO reserva_vuelo_clase(numero, vuelo, fecha_vuelo, clase) VALUES(id_nueva_reserva, id_vuelo, vuelo_fecha, clase_vuelo);					
+	
 		# Se aumenta la cantidad de asientos reservados
 		SET cant_reservados = cant_reservados + 1;
-		UPDATE asientos_reservados SET cantidad = cant_reservados WHERE vuelo = id_vuelo AND fecha = fecha_vuelo AND clase = clase_vuelo;
+		INSERT INTO asientos_reservados(vuelo, fecha, clase, cantidad) VALUES(id_vuelo, vuelo_fecha, clase_vuelo, cant_reservados) 
+		ON DUPLICATE KEY UPDATE cantidad = cant_reservados;
+						
 											
-		SET res = 'Se pudo realizar la reserva con exito';					
+		SET res = 'Se pudo realizar la reserva con exito';
+
+		
 	END
 	!
 									  
 
 DELIMITER ; # una vez creados los procedures se vuelve a establecer ; como delimitador
+
+/*
+GRANT EXECUTE ON PROCEDURE vuelos.realizar_reserva_ida TO 'empleado'@'%';
+GRANT EXECUTE ON PROCEDURE vuelos.realizar_reserva_ida_aux TO 'empleado'@'%';
+*/

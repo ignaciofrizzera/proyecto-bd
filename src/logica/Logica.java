@@ -360,6 +360,7 @@ public class Logica {
         java.sql.Date fecha_sql = fechas.Fechas.convertirDateADateSQL(fecha);
         String query;
         ResultSet rst;
+        String mensaje="error";
 
         query = "{call realizar_reserva_ida(?, ?, ?, ?, ?, ?, ?)}";
         CallableStatement cst = con.prepareCall(query);
@@ -369,12 +370,13 @@ public class Logica {
         cst.setString(4, tipo_doc);
         cst.setInt(5, num_doc);
         cst.setInt(6, legajo_empleado);
+        cst.setString(7, mensaje);
 
         /*Ver bien esto - el rst en 1 debería devolver el mensaje de error/bien del procedure*/
-        rst = cst.executeQuery();
+        cst.execute();
+        mensaje = cst.getString(7);
 
-        String mensaje = rst.getString(1);
-        rst.close();
+
         return mensaje;
     }
 
