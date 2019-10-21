@@ -4,10 +4,11 @@ import logica.Logica;
 
 import javax.swing.*;
 import java.awt.event.*;
+import java.sql.SQLException;
 import java.util.Date;
 
 public class DialogReservarIdaVuelta extends JDialog {
-    private final String ERROR_DNI= "El documento sólo puede contener números";
+    private final String ERROR_DNI = "El documento sólo puede contener números";
 
     private JPanel contentPane;
     private JButton buttonOK;
@@ -19,7 +20,8 @@ public class DialogReservarIdaVuelta extends JDialog {
     private String vueloIda, vueloVuelta;
     private Logica logica;
 
-    public DialogReservarIdaVuelta(Date fechaIda, String claseIda, String vueloIda, Date fechaVuelta, String claseVuelta, String vueloVuelta, Logica logica) {
+    public DialogReservarIdaVuelta(Date fechaIda, String claseIda, String vueloIda,
+                                   Date fechaVuelta, String claseVuelta, String vueloVuelta, Logica logica) {
         this.fechaIda = fechaIda;
         this.fechaVuelta = fechaVuelta;
         this.claseIda = claseIda;
@@ -66,10 +68,14 @@ public class DialogReservarIdaVuelta extends JDialog {
         int numeroDocumento;
         try {
             numeroDocumento = Integer.parseInt(numeroDocumentoString);
-            //logica.reservar_ida(fecha, clase, vuelo, tipoDocumento, numeroDocumento)
+            String res = logica.reservar_ida_vuelta(fechaIda, claseIda, vueloIda, fechaVuelta,
+                    claseVuelta, vueloVuelta, tipoDocumento, numeroDocumento);
+            showMsg(res);
             dispose();
         } catch (NumberFormatException e) {
             showMsg(ERROR_DNI);
+        } catch (SQLException e) {
+            showMsg(e.getMessage());
         }
     }
 

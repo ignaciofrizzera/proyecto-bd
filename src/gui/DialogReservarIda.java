@@ -75,9 +75,6 @@ public class DialogReservarIda extends JDialog {
         } catch (SQLException e){
             showMsg(e.getMessage());
         }
-
-
-
     }
     private void showMsg(String msg) {
         DialogMsg dialog = new DialogMsg(msg);

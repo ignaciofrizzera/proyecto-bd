@@ -188,20 +188,14 @@ public class GUI {
                     showMsg(MSG_ERROR_ELEGIR_RESERVA);
                 } else {
                     String vueloIda = (String) tableViajesIdaModel.getValueAt(tableViajesIda.getSelectedRow(), 0);
-
-
                     String dateIdaString = (String) tableViajesIdaModel.getValueAt(tableViajesIda.getSelectedRow(), tableViajesIda.getColumnCount() - 1);
                     Date fechaIda = Fechas.convertirStringADate(dateIdaString);
-
                     String claseIda = (String) tableVueloElegidoIdaModel.getValueAt(tableVueloElegidoIda.getSelectedRow(), 0);
 
-                    String vueloVuelta = (String) tableViajesIdaModel.getValueAt(tableViajesIda.getSelectedRow(), 0);
-
-
-                    String dateStringVuelta = (String) tableViajesIdaModel.getValueAt(tableViajesIda.getSelectedRow(), tableViajesIda.getColumnCount() - 1);
+                    String vueloVuelta = (String) tableViajesVueltaModel.getValueAt(tableViajesVuelta.getSelectedRow(), 0);
+                    String dateStringVuelta = (String) tableViajesVueltaModel.getValueAt(tableViajesVuelta.getSelectedRow(), tableViajesVuelta.getColumnCount() - 1);
                     Date fechaVuelta = Fechas.convertirStringADate(dateStringVuelta);
-
-                    String claseVuelta = (String) tableVueloElegidoIdaModel.getValueAt(tableVueloElegidoIda.getSelectedRow(), 0);
+                    String claseVuelta = (String) tableVueloElegidoVueltaModel.getValueAt(tableVueloElegidoVuelta.getSelectedRow(), 0);
 
                     DialogReservarIdaVuelta dialog = new DialogReservarIdaVuelta(fechaIda, claseIda, vueloIda, fechaVuelta, claseVuelta, vueloVuelta, logica);
                     dialog.pack();

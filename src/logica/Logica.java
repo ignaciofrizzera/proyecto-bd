@@ -1,5 +1,7 @@
 package logica;
 
+import fechas.Fechas;
+
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
@@ -347,11 +349,12 @@ public class Logica {
 
     /**
      * Intenta realizar una reserva de ida en base a los parametros ingresados
-     * @param fecha fecha de un vuelo a reservar
-     * @param clase clase de un vuelo a reservar
-     * @param vuelo id de un vuelo a reservar
+     *
+     * @param fecha    fecha de un vuelo a reservar
+     * @param clase    clase de un vuelo a reservar
+     * @param vuelo    id de un vuelo a reservar
      * @param tipo_doc tipo de documento de la persona que está reservando
-     * @param num_doc numero de documento de la persona que está reseservando
+     * @param num_doc  numero de documento de la persona que está reseservando
      * @return devuelve un String con el mensaje de error o éxito
      * @throws SQLException en el caso de perder la conexión con la bd a mitad de ejecución u otro inconveniente.
      */
@@ -360,7 +363,7 @@ public class Logica {
         java.sql.Date fecha_sql = fechas.Fechas.convertirDateADateSQL(fecha);
         String query;
         ResultSet rst;
-        String mensaje="error";
+        String mensaje = "error";
 
         query = "{call realizar_reserva_ida(?, ?, ?, ?, ?, ?, ?)}";
         CallableStatement cst = con.prepareCall(query);
@@ -372,23 +375,42 @@ public class Logica {
         cst.setInt(6, legajo_empleado);
         cst.setString(7, mensaje);
 
-        /*Ver bien esto - el rst en 1 debería devolver el mensaje de error/bien del procedure*/
         cst.execute();
         mensaje = cst.getString(7);
-
 
         return mensaje;
     }
 
+    public String reservar_ida_vuelta(Date fecha_ida, String clase_ida, String vuelo_ida, Date fecha_vuelta,
+                                      String clase_vuelta, String vuelo_vuelta, String tipo_doc, int num_doc) throws SQLException {
+        String mensaje = "error";
+        String query = "{call realizar_reserva_ida_vuelta(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+        CallableStatement cst = con.prepareCall(query);
+        cst.setString(1, vuelo_ida);
+        cst.setDate(2, Fechas.convertirDateADateSQL(fecha_ida));
+        cst.setString(3, clase_ida);
+        cst.setString(4, vuelo_vuelta);
+        cst.setDate(5, Fechas.convertirDateADateSQL(fecha_vuelta));
+        cst.setString(6, clase_vuelta);
+        cst.setString(7, tipo_doc);
+        cst.setInt(8, num_doc);
+        cst.setInt(9, legajo_empleado);
+        cst.setString(10, mensaje);
 
-    /**
-     * Metodo utilizado para finalizar la conexion con la base de datos
-     */
-    public void shutdown() throws SQLException {
-        if (con != null && !con.isClosed()) {
-            con.close();
-        }
+        cst.execute();
+        mensaje = cst.getString(10);
+
+        return mensaje;
     }
 
+        /**
+         * Metodo utilizado para finalizar la conexion con la base de datos
+         */
+        public void shutdown () throws SQLException {
+            if (con != null && !con.isClosed()) {
+                con.close();
+            }
+        }
 
-}
+
+    }

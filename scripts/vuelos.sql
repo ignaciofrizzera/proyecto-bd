@@ -305,7 +305,7 @@ CREATE VIEW vuelos_disponibles AS
 #	Creacion de usuarios y privilegios
 #
 
-/*
+
 CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';
 GRANT ALL PRIVILEGES ON vuelos.* TO 'admin'@'localhost' WITH GRANT OPTION;
 
@@ -318,7 +318,7 @@ GRANT DELETE, INSERT, UPDATE ON vuelos.reserva_vuelo_clase TO 'empleado'@'%';
 
 CREATE USER 'cliente'@'%' IDENTIFIED BY 'cliente';
 GRANT SELECT ON vuelos.vuelos_disponibles TO 'cliente'@'%';
-*/
+
 
 #
 #	Creacion de stored procedures
@@ -426,7 +426,7 @@ CREATE PROCEDURE realizar_reserva_ida_aux(IN id_vuelo VARCHAR(45), IN vuelo_fech
 	END
 	!
 	
-CREATE PROCEDURE realisar_reserva_ida_vuelta(IN id_vuelo_ida VARCHAR(45), IN fecha_vuelo_ida DATE, IN clase_vuelo_ida VARCHAR(45),
+CREATE PROCEDURE realizar_reserva_ida_vuelta(IN id_vuelo_ida VARCHAR(45), IN fecha_vuelo_ida DATE, IN clase_vuelo_ida VARCHAR(45),
 		IN id_vuelo_vuelta VARCHAr(45),IN fecha_vuelo_vuelta DATE,IN clase_vuelo_vuelta VARCHAR(45),
 		IN tipo_doc VARCHAR(10), IN nro_doc INT(10) UNSIGNED, IN legajo_emp INT(10) UNSIGNED, OUT res VARCHAR(100)) SALIDA_PROCEDURE:
 	BEGIN
@@ -470,7 +470,7 @@ CREATE PROCEDURE realisar_reserva_ida_vuelta(IN id_vuelo_ida VARCHAR(45), IN fec
 	
 		SET row_count = (SELECT count(*) FROM asientos_reservados);
 		IF(row_count = 0) THEN
-			CALL realisar_reserva_ida_vuelta_aux(id_vuelo_ida, fecha_vuelo_ida, clase_vuelo_ida, id_vuelo_vuelta, fecha_vuelo_vuelta, clase_vuelo_vuelta, tipo_doc,
+			CALL realizar_reserva_ida_vuelta_aux(id_vuelo_ida, fecha_vuelo_ida, clase_vuelo_ida, id_vuelo_vuelta, fecha_vuelo_vuelta, clase_vuelo_vuelta, tipo_doc,
 			nro_doc, legajo_emp, res);
 		ELSE 
 		BEGIN	
@@ -479,7 +479,7 @@ CREATE PROCEDURE realisar_reserva_ida_vuelta(IN id_vuelo_ida VARCHAR(45), IN fec
 			SELECT cantidad INTO cant_reservados_vuelta FROM asientos_reservados WHERE vuelo = id_vuelo_vuelta AND fecha = fecha_vuelo_vuelta AND clase = clase_vuelo_vuelta;
 			SELECT cant_libres INTO cant_disponibles_vuelta FROM vuelos_disponibles WHERE vuelo = id_vuelo_vuelta AND fecha = fecha_vuelo_vuelta AND clase = clase_vuelo_vuelta;
 			IF(cant_reservados_ida < cant_disponibles_ida AND cant_reservados_vuelta < cant_disponibles_vuelta) THEN
-				CALL realisar_reserva_ida_vuelta_aux(id_vuelo_ida, fecha_vuelo_ida, clase_vuelo_ida, id_vuelo_vuelta, fecha_vuelo_vuelta, clase_vuelo_vuelta, tipo_doc,
+				CALL realizar_reserva_ida_vuelta_aux(id_vuelo_ida, fecha_vuelo_ida, clase_vuelo_ida, id_vuelo_vuelta, fecha_vuelo_vuelta, clase_vuelo_vuelta, tipo_doc,
 				nro_doc, legajo_emp, res);
 			ELSE
 				SET res = 'No hay asientos disponibles para realizar la reserva';
@@ -490,7 +490,7 @@ CREATE PROCEDURE realisar_reserva_ida_vuelta(IN id_vuelo_ida VARCHAR(45), IN fec
 	END
 	!
 
-CREATE PROCEDURE realisar_reserva_ida_vuelta_aux(IN id_vuelo_ida VARCHAR(45), IN fecha_vuelo_ida DATE, IN clase_vuelo_ida VARCHAR(45),
+CREATE PROCEDURE realizar_reserva_ida_vuelta_aux(IN id_vuelo_ida VARCHAR(45), IN fecha_vuelo_ida DATE, IN clase_vuelo_ida VARCHAR(45),
 		IN id_vuelo_vuelta VARCHAr(45),IN fecha_vuelo_vuelta DATE,IN clase_vuelo_vuelta VARCHAR(45),
 		IN tipo_doc VARCHAR(10), IN nro_doc INT(10) UNSIGNED, IN legajo_emp INT(10) UNSIGNED, OUT res VARCHAR(100))
 	BEGIN
@@ -562,7 +562,7 @@ CREATE PROCEDURE realisar_reserva_ida_vuelta_aux(IN id_vuelo_ida VARCHAR(45), IN
 	!	
 DELIMITER ; # una vez creados los procedures se vuelve a establecer ; como delimitador
 
-/*
+
 GRANT EXECUTE ON PROCEDURE vuelos.realizar_reserva_ida TO 'empleado'@'%';
 GRANT EXECUTE ON PROCEDURE vuelos.realizar_reserva_ida_aux TO 'empleado'@'%';
 GRANT EXECUTE ON PROCEDURE vuelos.realizar_reserva_ida_vuelta TO 'empleado'@'%';
