@@ -4,7 +4,6 @@ import fechas.Fechas;
 import logica.Logica;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
@@ -170,14 +169,13 @@ public class GUI {
                     showMsg(MSG_ERROR_ELEGIR_RESERVA);
                 } else {
                     String stringVuelo = (String) tableViajesIdaModel.getValueAt(tableViajesIda.getSelectedRow(), 0);
-                    int vuelo = Integer.parseInt(stringVuelo);
 
                     String datesString = (String) tableViajesIdaModel.getValueAt(tableViajesIda.getSelectedRow(), tableViajesIda.getColumnCount() - 1);
                     Date fecha = Fechas.convertirStringADate(datesString);
 
                     String clase = (String) tableVueloElegidoIdaModel.getValueAt(tableVueloElegidoIda.getSelectedRow(), 0);
 
-                    DialogReservarIda dialog = new DialogReservarIda(fecha, clase, vuelo);
+                    DialogReservarIda dialog = new DialogReservarIda(fecha, clase, stringVuelo, logica);
                     dialog.pack();
                     dialog.setVisible(true);
                 }

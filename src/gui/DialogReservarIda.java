@@ -1,7 +1,11 @@
 package gui;
 
+import logica.Logica;
+import sun.rmi.runtime.Log;
+
 import javax.swing.*;
 import java.awt.event.*;
+import java.sql.SQLException;
 import java.util.Date;
 
 public class DialogReservarIda extends JDialog {
@@ -14,12 +18,14 @@ public class DialogReservarIda extends JDialog {
     private JTextField numeroDocumentoText;
     private Date fecha;
     private String clase;
-    private int vuelo;
+    private String vuelo;
+    private Logica logica;
 
-    public DialogReservarIda(Date fecha, String clase, int vuelo) {
+    public DialogReservarIda(Date fecha, String clase, String vuelo, Logica logica) {
         this.fecha = fecha;
         this.clase = clase;
         this.vuelo = vuelo;
+        this.logica = logica;
 
         setContentPane(contentPane);
         setModal(true);
@@ -56,14 +62,18 @@ public class DialogReservarIda extends JDialog {
     private void onOK() {
         String tipoDocumento = tipoDocumentoText.getText();
         String numeroDocumentoString = numeroDocumentoText.getText();
-
         int numeroDocumento;
+        String res=null;
+
         try {
             numeroDocumento = Integer.parseInt(numeroDocumentoString);
-            //logica.reservar_ida(fecha, clase, vuelo, tipoDocumento, numeroDocumento)
+            res = logica.reservar_ida(fecha, clase, vuelo, tipoDocumento, numeroDocumento);
+            showMsg(res);
             dispose();
         } catch (NumberFormatException e) {
             showMsg(ERROR_DNI);
+        } catch (SQLException e){
+            showMsg(e.getMessage());
         }
 
 

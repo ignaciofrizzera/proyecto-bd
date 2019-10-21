@@ -1,5 +1,7 @@
 package gui;
 
+import logica.Logica;
+
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.Date;
@@ -14,15 +16,17 @@ public class DialogReservarIdaVuelta extends JDialog {
     private JTextField numeroDocumentoText;
     private Date fechaIda, fechaVuelta;
     private String claseIda, claseVuelta;
-    private int vueloIda, vueloVuelta;
+    private String vueloIda, vueloVuelta;
+    private Logica logica;
 
-    public DialogReservarIdaVuelta(Date fechaIda, String claseIda, int vueloIda, Date fechaVuelta, String claseVuelta, int vueloVuelta) {
+    public DialogReservarIdaVuelta(Date fechaIda, String claseIda, String vueloIda, Date fechaVuelta, String claseVuelta, String vueloVuelta, Logica logica) {
         this.fechaIda = fechaIda;
         this.fechaVuelta = fechaVuelta;
         this.claseIda = claseIda;
         this.claseVuelta = claseVuelta;
         this.vueloIda = vueloIda;
         this.vueloVuelta = vueloVuelta;
+        this.logica = logica;
 
         setContentPane(contentPane);
         setModal(true);

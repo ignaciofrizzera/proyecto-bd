@@ -356,15 +356,15 @@ public class Logica {
      * @throws SQLException en el caso de perder la conexión con la bd a mitad de ejecución u otro inconveniente.
      */
     public String reservar_ida(Date fecha, String clase, String vuelo, String tipo_doc, int num_doc) throws SQLException {
-        /*Verificar que los datos pertenezcan a la base de datos*/
-        Date fecha_sql = fechas.Fechas.convertirDateADateSQL(fecha);
+
+        java.sql.Date fecha_sql = fechas.Fechas.convertirDateADateSQL(fecha);
         String query;
         ResultSet rst;
 
         query = "{call realizar_reserva_ida(?, ?, ?, ?, ?, ?, ?)}";
         CallableStatement cst = con.prepareCall(query);
         cst.setString(1, vuelo);
-        //TODO VER FORMATO DE LA FECHA - cst.setDate(2, NULL);
+        cst.setDate(2, fecha_sql);
         cst.setString(3, clase);
         cst.setString(4, tipo_doc);
         cst.setInt(5, num_doc);
