@@ -3,8 +3,10 @@ package logica;
 import fechas.Fechas;
 
 import java.sql.*;
-import java.util.*;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.StringTokenizer;
 
 /**
  * Clase destinada a realizar la comunicacion con la base de datos mediante
@@ -45,11 +47,7 @@ public class Logica {
      */
     public boolean conectar_admin(char[] password) {
         String password_aux = String.valueOf(password);
-        if (this.establecer_conexion("admin", password_aux)) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.establecer_conexion("admin", password_aux);
     }
 
     /**
@@ -148,9 +146,7 @@ public class Logica {
             Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection(url, usuario, password);
             return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        } catch (SQLException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             return false;
         }
     }
@@ -161,7 +157,7 @@ public class Logica {
      * @return todas las tablas de la base de datos en uso
      */
     public Collection<String> get_tablas() throws SQLException {
-        LinkedList<String> tablas = new LinkedList<String>();
+        LinkedList<String> tablas = new LinkedList<>();
         String query = "show tables";
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery(query);
@@ -182,7 +178,7 @@ public class Logica {
      * @return lista de atributos de la tabla pasada por parametro
      */
     public Collection<String> get_atributos(String tabla) throws SQLException {
-        LinkedList<String> atributos = new LinkedList<String>();
+        LinkedList<String> atributos = new LinkedList<>();
         String query = "describe " + tabla;
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery(query);
@@ -245,7 +241,7 @@ public class Logica {
         int cant_columnas = rsmd.getColumnCount();
         int i;
 
-        LinkedList<String> nombre_atributos = new LinkedList<String>();
+        LinkedList<String> nombre_atributos = new LinkedList<>();
         for (i = 1; i <= cant_columnas; i++) {
             nombre_atributos.addLast(rsmd.getColumnName(i));
         }
@@ -254,7 +250,7 @@ public class Logica {
         i = 1;
         LinkedList<String> lista_aux;
         while (rst.next()) {
-            lista_aux = new LinkedList<String>();
+            lista_aux = new LinkedList<>();
             while (i <= cant_columnas) {
                 lista_aux.addLast(rst.getString(i));
                 i++;
@@ -274,7 +270,7 @@ public class Logica {
      * @return coleccion con las ciudades de las que parte un vuelo
      */
     public Collection<String> ciudades_origen() throws SQLException {
-        LinkedList<String> ciudades = new LinkedList<String>();
+        LinkedList<String> ciudades = new LinkedList<>();
         String query = "select ciudad" +
                 " from vuelos_programados join aeropuertos on aeropuerto_salida = codigo" +
                 " group by ciudad";
@@ -294,7 +290,7 @@ public class Logica {
      * @return coleccion con las ciudades de las que llega un vuelo
      */
     public Collection<String> ciudades_destino() throws SQLException {
-        LinkedList<String> ciudades = new LinkedList<String>();
+        LinkedList<String> ciudades = new LinkedList<>();
         String query = "select ciudad" +
                 " from vuelos_programados join aeropuertos on aeropuerto_llegada = codigo" +
                 " group by ciudad";

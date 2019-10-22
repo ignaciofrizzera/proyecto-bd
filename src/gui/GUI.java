@@ -60,42 +60,33 @@ public class GUI {
         GUI myGUI = this;
         logica = new Logica();
 
-        adminButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                DialogAdmin dialog = new DialogAdmin(myGUI);
-                dialog.pack();
-                dialog.setVisible(true);
+        adminButton.addActionListener(actionEvent -> {
+            DialogAdmin dialog = new DialogAdmin(myGUI);
+            dialog.pack();
+            dialog.setVisible(true);
 
-            }
         });
-        userButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                DialogUser dialog = new DialogUser(myGUI);
-                dialog.pack();
-                dialog.setVisible(true);
-            }
+        userButton.addActionListener(actionEvent -> {
+            DialogUser dialog = new DialogUser(myGUI);
+            dialog.pack();
+            dialog.setVisible(true);
         });
 
 
-        consultarButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                String query = textSQL.getText();
-                try {
-                    Collection<Collection<String>> resultado = logica.recibir_statement(query);
+        consultarButton.addActionListener(actionEvent -> {
+            String query = textSQL.getText();
+            try {
+                Collection<Collection<String>> resultado = logica.recibir_statement(query);
 
-                    if (resultado != null) {
-                        updateTable(valuesTableModel, resultado);
-                    } else {
-                        showMsg("Se actualizó la base de datos correctamente");
-                    }
-                } catch (SQLException e) {
-                    showMsg(e.getMessage());
+                if (resultado != null) {
+                    updateTable(valuesTableModel, resultado);
+                } else {
+                    showMsg("Se actualizó la base de datos correctamente");
                 }
-
+            } catch (SQLException e) {
+                showMsg(e.getMessage());
             }
+
         });
 
         tablesList.addMouseListener(new MouseAdapter() {
@@ -131,25 +122,21 @@ public class GUI {
                 }
             }
         });
-        buscarVuelosButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                buscarVuelos();
+        buscarVuelosButton.addActionListener(actionEvent -> {
+            buscarVuelos();
 
-                tableVueloElegidoIdaModel.setColumnCount(0);
-                tableVueloElegidoIdaModel.setRowCount(0);
+            tableVueloElegidoIdaModel.setColumnCount(0);
+            tableVueloElegidoIdaModel.setRowCount(0);
 
-                tableVueloElegidoVueltaModel.setColumnCount(0);
-                tableVueloElegidoVueltaModel.setRowCount(0);
+            tableVueloElegidoVueltaModel.setColumnCount(0);
+            tableVueloElegidoVueltaModel.setRowCount(0);
 
-                if (!idaVueltaCheckBox.isSelected()) {
-                    tableViajesVueltaModel.setColumnCount(0);
-                    tableViajesVueltaModel.setRowCount(0);
-                }
-
+            if (!idaVueltaCheckBox.isSelected()) {
+                tableViajesVueltaModel.setColumnCount(0);
+                tableViajesVueltaModel.setRowCount(0);
             }
-        });
 
+        });
 
         tableViajesVuelta.addMouseListener(new ElegirVueloListener(tableViajesVuelta, tableViajesVueltaModel, tableVueloElegidoVueltaModel));
         tableViajesIda.addMouseListener(new ElegirVueloListener(tableViajesIda, tableViajesIdaModel, tableVueloElegidoIdaModel));
@@ -273,7 +260,7 @@ public class GUI {
         model.setColumnCount(0);
         model.setRowCount(0);
 
-        if (model == null || result == null) {
+        if (result == null) {
             showMsg("Error result es null o model es null");
             return;
         }
@@ -357,41 +344,38 @@ public class GUI {
     }
 
     public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    GUI g = new GUI();
-                    JFrame frame = new JFrame();
-                    frame.setSize(1920, 1080);
-                    frame.setVisible(true);
-                    frame.setContentPane(g.mainPanel);
-                    frame.addWindowListener(new WindowAdapter() {
-                        @Override
-                        public void windowClosing(WindowEvent e) {
-                            try {
-                                logica.shutdown();
-                            } catch (SQLException sqlE) {
-                            } finally {
-                                System.exit(0);
+        EventQueue.invokeLater(() -> {
+            try {
+                GUI g = new GUI();
+                JFrame frame = new JFrame();
+                frame.setSize(1920, 1080);
+                frame.setVisible(true);
+                frame.setContentPane(g.mainPanel);
+                frame.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        try {
+                            logica.shutdown();
+                        } catch (SQLException sqlE) {
+                        } finally {
+                            System.exit(0);
 
-                            }
                         }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
 
 
     private void createUIComponents() {
-        tablesListModel = new DefaultListModel<String>();
-        tablesList = new JList<String>(tablesListModel);
+        tablesListModel = new DefaultListModel<>();
+        tablesList = new JList<>(tablesListModel);
 
         atributeListModel = new DefaultListModel<>();
-        atributeList = new JList<String>(atributeListModel);
+        atributeList = new JList<>(atributeListModel);
 
         valuesTableModel = new DefaultTableModel();
         valuesTable = new JTable(valuesTableModel);
@@ -410,8 +394,9 @@ public class GUI {
     }
 
     private class ElegirVueloListener extends MouseAdapter {
-        private DefaultTableModel myModel, targetModel;
-        private JTable myTable;
+        private final DefaultTableModel myModel;
+        private final DefaultTableModel targetModel;
+        private final JTable myTable;
 
         public ElegirVueloListener(JTable myTable, DefaultTableModel myModel, DefaultTableModel targetModel) {
             this.myModel = myModel;

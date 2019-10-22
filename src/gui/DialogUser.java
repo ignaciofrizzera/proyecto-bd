@@ -1,7 +1,6 @@
 package gui;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
 
 public class DialogUser extends JDialog {
@@ -13,7 +12,7 @@ public class DialogUser extends JDialog {
     private JTextField userTextField;
     private JLabel passwordLabel;
     private JPasswordField passwordField;
-    private GUI mainGUI;
+    private final GUI mainGUI;
 
     public DialogUser(GUI mainGUI) {
         this.mainGUI = mainGUI;
@@ -21,17 +20,9 @@ public class DialogUser extends JDialog {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
+        buttonOK.addActionListener(e -> onOK());
 
-        buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
+        buttonCancel.addActionListener(e -> onCancel());
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -42,11 +33,7 @@ public class DialogUser extends JDialog {
         });
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
     private void onOK() {

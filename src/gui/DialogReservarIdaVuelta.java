@@ -8,17 +8,19 @@ import java.sql.SQLException;
 import java.util.Date;
 
 public class DialogReservarIdaVuelta extends JDialog {
-    private final String ERROR_DNI = "El documento sólo puede contener números";
 
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JTextField tipoDocumentoText;
     private JTextField numeroDocumentoText;
-    private Date fechaIda, fechaVuelta;
-    private String claseIda, claseVuelta;
-    private String vueloIda, vueloVuelta;
-    private Logica logica;
+    private final Date fechaIda;
+    private final Date fechaVuelta;
+    private final String claseIda;
+    private final String claseVuelta;
+    private final String vueloIda;
+    private final String vueloVuelta;
+    private final Logica logica;
 
     public DialogReservarIdaVuelta(Date fechaIda, String claseIda, String vueloIda,
                                    Date fechaVuelta, String claseVuelta, String vueloVuelta, Logica logica) {
@@ -34,17 +36,9 @@ public class DialogReservarIdaVuelta extends JDialog {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
+        buttonOK.addActionListener(e -> onOK());
 
-        buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
+        buttonCancel.addActionListener(e -> onCancel());
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -55,11 +49,7 @@ public class DialogReservarIdaVuelta extends JDialog {
         });
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
     private void onOK() {
@@ -73,6 +63,7 @@ public class DialogReservarIdaVuelta extends JDialog {
             showMsg(res);
             dispose();
         } catch (NumberFormatException e) {
+            String ERROR_DNI = "El documento sólo puede contener números";
             showMsg(ERROR_DNI);
         } catch (SQLException e) {
             showMsg(e.getMessage());
