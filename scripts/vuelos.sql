@@ -326,54 +326,59 @@ GRANT SELECT ON vuelos.vuelos_disponibles TO 'cliente'@'%';
 
 DELIMITER ! # delimitiador a usar para los procedures
 
-#numero, fecha, clase de vuelo - vuelo VARCHAR(45) NOT NULL - fecha DATE - clase VARCHAR(45) NOT NULL,
-#tipo y numero doc del pasajero - 	doc_tipo VARCHAR(10) - doc_nro INT(10) UNSIGNED,
-#legajo del empleado que gestiona la reserva - 	legajo INT(10) UNSIGNED NOT NULL,
 CREATE PROCEDURE realizar_reserva_ida(IN id_vuelo VARCHAR(45), IN fecha_vuelo DATE, IN clase_vuelo VARCHAR(45), IN tipo_doc VARCHAR(10),
-									  IN nro_doc INT(10) UNSIGNED, IN legajo_emp INT(10) UNSIGNED, OUT res VARCHAR(100))
+									  IN nro_doc INT(10) UNSIGNED, IN legajo_emp INT(10) UNSIGNED, OUT res VARCHAR(100)) SALIDA_PROCEDURE:
+
 	BEGIN
-		/*Verificar datos*/
-		# Casos donde los datos no existan
 		DECLARE row_count INT;
+		DECLARE cant_reservados INT;
+		DECLARE cant_disponibles INT;
+		DECLARE EXIT HANDLER FOR SQLEXCEPTION # Definicion de un handler para manejar posibles errores
+			BEGIN # Caso de error se notifica con el mensaje
+				SET res = 'Error al realizar la reserva';
+				ROLLBACK;
+			END;
+		START TRANSACTION;
+			SET row_count = (SELECT count(*) FROM vuelos_disponibles WHERE id_vuelo = vuelo AND fecha = fecha_vuelo AND clase = clase_vuelo);
+			IF (row_count = 0) THEN /*Caso que el vuelo de ida con la fecha y clase no existan en la b.d*/
+				BEGIN
+					SET res = 'No existe el vuelo en la base de datos';
+					LEAVE SALIDA_PROCEDURE;
+				END;
+			END IF;
 		
-		SET row_count = (SELECT count(*) FROM vuelos_disponibles WHERE id_vuelo = vuelo AND fecha = fecha_vuelo AND clase = clase_vuelo);
-
-		IF (row_count = 0) THEN /*Caso que el vuelo con la fecha y clase no existan en la b.d*/
-			SET res = 'No hay asientos disponibles para realizar la reserva';
-		ELSE BEGIN
-				 SET row_count = (SELECT count(*) FROM pasajeros WHERE doc_tipo = tipo_doc AND nro_doc = doc_nro);
-				 IF (row_count = 0) THEN /*Caso que la persona que desea realizar la reserva no este en la b.d*/
-				 	SET res = 'No existe la persona que desea realizar la reserva en la base de datos';
-				 ELSE BEGIN
-					 	  SET row_count = (SELECT count(*) from empleados where legajo_emp = legajo);
-						  IF (row_count = 0) THEN /*Caso que el empleado que va a manejar la reserva no este en la b.d*/
-						  	SET res = 'No existe el empleado que debe atender la reserva en la base de datos';
-						  ELSE BEGIN /*Caso que los datos sean validos se procede a realizar la reserva*/
-							  	   SET row_count = (SELECT count(*) FROM asientos_reservados);
-							  	   IF(row_count = 0) THEN /*Caso que no se haya realizado ninguna reserva la tabla estara vacia*/
-							  	   		CALL realizar_reserva_ida_aux(id_vuelo,fecha_vuelo,clase_vuelo,tipo_doc,nro_doc,legajo_emp,res);
-							  	   ELSE BEGIN  
-								  	   DECLARE cant_reservados INT;
-									   DECLARE cant_disponibles INT;
-									   
-									   SELECT cant_libres INTO cant_disponibles FROM vuelos_disponibles WHERE vuelo = id_vuelo AND fecha_vuelo = fecha AND clase_vuelo = clase;
-									   SELECT cantidad INTO cant_reservados FROM asientos_reservados WHERE vuelo = id_vuelo AND fecha_vuelo = fecha AND clase_vuelo = clase;
-									   IF(cant_reservados < cant_disponibles) THEN # Caso que se puede realizar una reserva
-											CALL realizar_reserva_ida_aux(id_vuelo,fecha_vuelo,clase_vuelo,tipo_doc,nro_doc,legajo_emp,res);
-									   ELSE
-									  	SET res = 'No hay asientos disponibles para realizar la reserva';
-						  			  END IF;
-						  			END;
-						  		 	END IF;
-						  	 	END;
-						  	 	END IF;
-						  	 END;
-						  	 END IF;
-		END;
-		END IF;
-	END
-	!
-
+			SET row_count = (SELECT count(*) FROM pasajeros WHERE doc_tipo = tipo_doc AND nro_doc = doc_nro);
+			IF(row_count = 0) THEN
+				BEGIN
+					SET res = 'No existe la persona que desea realizar la reserva en la base de datos';
+					LEAVE SALIDA_PROCEDURE;
+				END;
+			END IF;
+		
+			SET row_count = (SELECT count(*) FROM empleados WHERE legajo = legajo_emp);
+			IF(row_count = 0) THEN
+				BEGIN
+					SET res = 'No existe el empleado que debe atender la reserva en la base de datos';
+					LEAVE SALIDA_PROCEDURE;
+				END;
+			END IF;
+		
+			SET row_count = (SELECT count(*) FROM asientos_reservados);
+			IF(row_count = 0) THEN
+				CALL realizar_reserva_ida_aux(id_vuelo, fecha_vuelo, clase_vuelo, id_vuelo, fecha_vuelo, clase_vuelo, tipo_doc, nro_doc, legajo_emp, res);
+			ELSE 
+			BEGIN	
+				SELECT cantidad INTO cant_reservados FROM asientos_reservados WHERE vuelo = id_vuelo AND fecha = fecha_vuelo AND clase = clase_vuelo;
+				SELECT cant_libres INTO cant_disponibles FROM vuelos_disponibles WHERE vuelo = id_vuelo AND fecha = fecha_vuelo AND clase = clase_vuelo;
+				IF(cant_disponibles > 0) THEN
+					CALL realizar_reserva_ida_aux(id_vuelo, fecha_vuelo, clase_vuelo, tipo_doc, nro_doc, legajo_emp, res);
+				ELSE
+					SET res = 'No hay asientos disponibles para realizar la reserva';
+				END IF;
+			END;
+			END IF;
+		COMMIT;
+	END;!
 	
 CREATE PROCEDURE realizar_reserva_ida_aux(IN id_vuelo VARCHAR(45), IN vuelo_fecha DATE, IN clase_vuelo VARCHAR(45), IN tipo_doc VARCHAR(10),
 									  IN nro_doc INT(10) UNSIGNED, IN legajo_emp INT(10) UNSIGNED, OUT res VARCHAR(100))
@@ -423,8 +428,7 @@ CREATE PROCEDURE realizar_reserva_ida_aux(IN id_vuelo VARCHAR(45), IN vuelo_fech
 		SET res = 'Se pudo realizar la reserva con exito';
 
 		
-	END
-	!
+	END;!
 	
 CREATE PROCEDURE realizar_reserva_ida_vuelta(IN id_vuelo_ida VARCHAR(45), IN fecha_vuelo_ida DATE, IN clase_vuelo_ida VARCHAR(45),
 		IN id_vuelo_vuelta VARCHAr(45),IN fecha_vuelo_vuelta DATE,IN clase_vuelo_vuelta VARCHAR(45),
@@ -435,60 +439,64 @@ CREATE PROCEDURE realizar_reserva_ida_vuelta(IN id_vuelo_ida VARCHAR(45), IN fec
 		DECLARE cant_reservados_vuelta INT;		
 		DECLARE cant_disponibles_ida INT;
 		DECLARE cant_disponibles_vuelta INT;
-	
-		SET row_count = (SELECT count(*) FROM vuelos_disponibles WHERE id_vuelo_ida = vuelo AND fecha = fecha_vuelo_ida AND clase = clase_vuelo_ida);
-		IF (row_count = 0) THEN /*Caso que el vuelo de ida con la fecha y clase no existan en la b.d*/
-			BEGIN
-				SET res = 'No existe el vuelo de ida en la base de datos';
-				LEAVE SALIDA_PROCEDURE;
+		DECLARE EXIT HANDLER FOR SQLEXCEPTION # Definicion de un handler para manejar posibles errores
+			BEGIN # Caso de error se notifica con un mensaje
+				SET res = 'Error al realizar la reserva';
+				ROLLBACK;
 			END;
-		END IF;
-	
-		SET row_count = (SELECT count(*) FROM vuelos_disponibles WHERE id_vuelo_vuelta = vuelo AND fecha = fecha_vuelo_vuelta AND clase = clase_vuelo_vuelta);
-		IF(row_count = 0) THEN /*Caso que el vuelo de vuelta con la fecha y clase no existan en la b.d*/
-			BEGIN
-				SET res = 'No existe el vuelo de vuelta en la base de datos';
-				LEAVE SALIDA_PROCEDURE;
-			END;
-		END IF;
+		START TRANSACTION;
+			SET row_count = (SELECT count(*) FROM vuelos_disponibles WHERE id_vuelo_ida = vuelo AND fecha = fecha_vuelo_ida AND clase = clase_vuelo_ida);
+			IF (row_count = 0) THEN /*Caso que el vuelo de ida con la fecha y clase no existan en la b.d*/
+				BEGIN
+					SET res = 'No existe el vuelo de ida en la base de datos';
+					LEAVE SALIDA_PROCEDURE;
+				END;
+			END IF;
 		
-		SET row_count = (SELECT count(*) FROM pasajeros WHERE doc_tipo = tipo_doc AND nro_doc = doc_nro);
-		IF(row_count = 0) THEN
-			BEGIN
-				SET res = 'No existe la persona que desea realizar la reserva en la base de datos';
-				LEAVE SALIDA_PROCEDURE;
-			END;
-		END IF;
-	
-		SET row_count = (SELECT count(*) FROM empleados WHERE legajo = legajo_emp);
-		IF(row_count = 0) THEN
-			BEGIN
-				SET res = 'No existe el empleado que debe atender la reserva en la base de datos';
-				LEAVE SALIDA_PROCEDURE;
-			END;
-		END IF;
-	
-		SET row_count = (SELECT count(*) FROM asientos_reservados);
-		IF(row_count = 0) THEN
-			CALL realizar_reserva_ida_vuelta_aux(id_vuelo_ida, fecha_vuelo_ida, clase_vuelo_ida, id_vuelo_vuelta, fecha_vuelo_vuelta, clase_vuelo_vuelta, tipo_doc,
-			nro_doc, legajo_emp, res);
-		ELSE 
-		BEGIN	
-			SELECT cantidad INTO cant_reservados_ida FROM asientos_reservados WHERE vuelo = id_vuelo_ida AND fecha = fecha_vuelo_ida AND clase = clase_vuelo_ida;
-			SELECT cant_libres INTO cant_disponibles_ida FROM vuelos_disponibles WHERE vuelo = id_vuelo_ida AND fecha = fecha_vuelo_ida AND clase = clase_vuelo_ida;
-			SELECT cantidad INTO cant_reservados_vuelta FROM asientos_reservados WHERE vuelo = id_vuelo_vuelta AND fecha = fecha_vuelo_vuelta AND clase = clase_vuelo_vuelta;
-			SELECT cant_libres INTO cant_disponibles_vuelta FROM vuelos_disponibles WHERE vuelo = id_vuelo_vuelta AND fecha = fecha_vuelo_vuelta AND clase = clase_vuelo_vuelta;
-			IF(cant_reservados_ida < cant_disponibles_ida AND cant_reservados_vuelta < cant_disponibles_vuelta) THEN
+			SET row_count = (SELECT count(*) FROM vuelos_disponibles WHERE id_vuelo_vuelta = vuelo AND fecha = fecha_vuelo_vuelta AND clase = clase_vuelo_vuelta);
+			IF(row_count = 0) THEN /*Caso que el vuelo de vuelta con la fecha y clase no existan en la b.d*/
+				BEGIN
+					SET res = 'No existe el vuelo de vuelta en la base de datos';
+					LEAVE SALIDA_PROCEDURE;
+				END;
+			END IF;
+			
+			SET row_count = (SELECT count(*) FROM pasajeros WHERE doc_tipo = tipo_doc AND nro_doc = doc_nro);
+			IF(row_count = 0) THEN
+				BEGIN
+					SET res = 'No existe la persona que desea realizar la reserva en la base de datos';
+					LEAVE SALIDA_PROCEDURE;
+				END;
+			END IF;
+		
+			SET row_count = (SELECT count(*) FROM empleados WHERE legajo = legajo_emp);
+			IF(row_count = 0) THEN
+				BEGIN
+					SET res = 'No existe el empleado que debe atender la reserva en la base de datos';
+					LEAVE SALIDA_PROCEDURE;
+				END;
+			END IF;
+		
+			SET row_count = (SELECT count(*) FROM asientos_reservados);
+			IF(row_count = 0) THEN
 				CALL realizar_reserva_ida_vuelta_aux(id_vuelo_ida, fecha_vuelo_ida, clase_vuelo_ida, id_vuelo_vuelta, fecha_vuelo_vuelta, clase_vuelo_vuelta, tipo_doc,
 				nro_doc, legajo_emp, res);
-			ELSE
-				SET res = 'No hay asientos disponibles para realizar la reserva';
+			ELSE 
+			BEGIN	
+				SELECT cantidad INTO cant_reservados_ida FROM asientos_reservados WHERE vuelo = id_vuelo_ida AND fecha = fecha_vuelo_ida AND clase = clase_vuelo_ida;
+				SELECT cant_libres INTO cant_disponibles_ida FROM vuelos_disponibles WHERE vuelo = id_vuelo_ida AND fecha = fecha_vuelo_ida AND clase = clase_vuelo_ida;
+				SELECT cantidad INTO cant_reservados_vuelta FROM asientos_reservados WHERE vuelo = id_vuelo_vuelta AND fecha = fecha_vuelo_vuelta AND clase = clase_vuelo_vuelta;
+				SELECT cant_libres INTO cant_disponibles_vuelta FROM vuelos_disponibles WHERE vuelo = id_vuelo_vuelta AND fecha = fecha_vuelo_vuelta AND clase = clase_vuelo_vuelta;
+				IF(cant_disponibles_ida > 0 AND cant_disponibles_vuelta > 0) THEN
+					CALL realizar_reserva_ida_vuelta_aux(id_vuelo_ida, fecha_vuelo_ida, clase_vuelo_ida, id_vuelo_vuelta, fecha_vuelo_vuelta, clase_vuelo_vuelta, tipo_doc,
+					nro_doc, legajo_emp, res);
+				ELSE
+					SET res = 'No hay asientos disponibles para realizar la reserva';
+				END IF;
+			END;
 			END IF;
-		END;
-		END IF;
-		
-	END
-	!
+		COMMIT;
+	END;!
 
 CREATE PROCEDURE realizar_reserva_ida_vuelta_aux(IN id_vuelo_ida VARCHAR(45), IN fecha_vuelo_ida DATE, IN clase_vuelo_ida VARCHAR(45),
 		IN id_vuelo_vuelta VARCHAr(45),IN fecha_vuelo_vuelta DATE,IN clase_vuelo_vuelta VARCHAR(45),
@@ -558,8 +566,7 @@ CREATE PROCEDURE realizar_reserva_ida_vuelta_aux(IN id_vuelo_ida VARCHAR(45), IN
 		ON DUPLICATE KEY UPDATE cantidad = cant_reservados_vuelta;	
 	
 		SET res = 'Se pudo realizar la reserva con exito';
-	END
-	!	
+	END;!	
 DELIMITER ; # una vez creados los procedures se vuelve a establecer ; como delimitador
 
 

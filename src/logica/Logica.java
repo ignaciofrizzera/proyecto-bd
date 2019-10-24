@@ -23,21 +23,6 @@ public class Logica {
     private int legajo_empleado; //Legajo del empleado que ha iniciado sesión.
     private Connection con;
 
-    public static void main(String[] args) {
-        Logica logica = new Logica();
-        try {
-            if (logica.establecer_conexion("admin", "admin")) {
-                System.out.println("aca conecte");
-                Date d = new Date();
-                String aux = logica.reservar_ida(d, "clase", "15", " ", 15);
-                System.out.println("aux");
-            } else
-                System.out.println("no");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
     /**
      * conexion del admin. a la base de datos
      *
@@ -47,7 +32,7 @@ public class Logica {
      */
     public boolean conectar_admin(char[] password) {
         String password_aux = String.valueOf(password);
-        return this.establecer_conexion("admin", password_aux);
+        return this.establecer_conexion(admin, password_aux);
     }
 
     /**
