@@ -67,21 +67,21 @@ INSERT INTO salidas(vuelo, dia, hora_sale, hora_llega, modelo_avion) VALUES("000
 INSERT INTO salidas(vuelo, dia, hora_sale, hora_llega, modelo_avion) VALUES("0005", "Vi", '05:35', '11:15', "Delta 0");
 
 
-#INSERCION EN BRINDA
-INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0001", "Lu", "Economica", 8905.94, 100);
-INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0001", "Lu", "Media", 10000, 10);
-INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0002", "Do", "Primera Clase", 18905.94, 40);
-INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0003", "Ma", "Media", 12905.94, 70);
-INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0004", "Mi", "Super economica", 3905.94, 140);
-INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0005", "Vi", "Intermedia", 6905.94, 75);
-
-
 #INSERCION EN INSTANCIAS VUELO
 INSERT INTO instancias_vuelo(vuelo, fecha, dia, estado) VALUES("0001", "2019/08/21", "Lu", "Cancelado");
 INSERT INTO instancias_vuelo(vuelo, fecha, dia, estado) VALUES("0002", "2019/11/07", "Do", "Demorado");
 INSERT INTO instancias_vuelo(vuelo, fecha, dia, estado) VALUES("0003", "2019/10/19", "Ma", "En horario");
 INSERT INTO instancias_vuelo(vuelo, fecha, dia, estado) VALUES("0004", "2019/12/31", "Mi", "Demorado");
 INSERT INTO instancias_vuelo(vuelo, fecha, dia, estado) VALUES("0005", "2020/02/01", "Vi", "En horario");
+
+
+#INSERCION EN BRINDA
+INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0001", "Lu", "Economica", 8905.94, 100);
+INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0001", "Lu", "Media", 10000, 5);
+INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0002", "Do", "Primera Clase", 18905.94, 40);
+INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0003", "Ma", "Media", 12905.94, 70);
+INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0004", "Mi", "Super economica", 3905.94, 140);
+INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0005", "Vi", "Intermedia", 6905.94, 75);
 
 
 #INSERCION EN EMPLEADOS
