@@ -342,7 +342,8 @@ CREATE PROCEDURE realizar_reserva_ida(IN id_vuelo VARCHAR(45), IN fecha_vuelo DA
 			IF (row_count = 0) THEN /*Caso que el vuelo de ida con la fecha y clase no existan en la b.d*/
 				BEGIN
 					SET res = 'No existe el vuelo en la base de datos';
-					LEAVE SALIDA_PROCEDURE;
+					COMMIT; # Se comitea la transaccion, no se llego a modificar ningun dato por lo que no es necesario un rollback 
+					LEAVE SALIDA_PROCEDURE; # se abandona el stored procedure de inmediato
 				END;
 			END IF;
 		
@@ -350,6 +351,7 @@ CREATE PROCEDURE realizar_reserva_ida(IN id_vuelo VARCHAR(45), IN fecha_vuelo DA
 			IF(row_count = 0) THEN
 				BEGIN
 					SET res = 'No existe la persona que desea realizar la reserva en la base de datos';
+					COMMIT;
 					LEAVE SALIDA_PROCEDURE;
 				END;
 			END IF;
@@ -358,6 +360,7 @@ CREATE PROCEDURE realizar_reserva_ida(IN id_vuelo VARCHAR(45), IN fecha_vuelo DA
 			IF(row_count = 0) THEN
 				BEGIN
 					SET res = 'No existe el empleado que debe atender la reserva en la base de datos';
+					COMMIT;
 					LEAVE SALIDA_PROCEDURE;
 				END;
 			END IF;
@@ -392,7 +395,7 @@ CREATE PROCEDURE realizar_reserva_ida_aux(IN id_vuelo VARCHAR(45), IN vuelo_fech
 				
 		SELECT cant_asientos INTO asientos_cant FROM vuelos_disponibles WHERE vuelo = id_vuelo AND vuelo_fecha = fecha AND clase_vuelo = clase LOCK IN SHARE MODE;
 	
-		SET cant_reservados = (SELECT count(*) FROM asientos_reservados WHERE vuelo = id_vuelo AND vuelo_fecha = fecha AND clase_vuelo = clase); # Marcar con for up.?
+		SET cant_reservados = (SELECT count(*) FROM asientos_reservados WHERE vuelo = id_vuelo AND vuelo_fecha = fecha AND clase_vuelo = clase FOR UPDATE); 
 		if(cant_reservados = 0) THEN
 			SET cant_reservados = 0;
 		ELSE
@@ -442,6 +445,7 @@ CREATE PROCEDURE realizar_reserva_ida_vuelta(IN id_vuelo_ida VARCHAR(45), IN fec
 			IF (row_count = 0) THEN /*Caso que el vuelo de ida con la fecha y clase no existan en la b.d*/
 				BEGIN
 					SET res = 'No existe el vuelo de ida en la base de datos';
+					COMMIT;
 					LEAVE SALIDA_PROCEDURE;
 				END;
 			END IF;
@@ -450,6 +454,7 @@ CREATE PROCEDURE realizar_reserva_ida_vuelta(IN id_vuelo_ida VARCHAR(45), IN fec
 			IF(row_count = 0) THEN /*Caso que el vuelo de vuelta con la fecha y clase no existan en la b.d*/
 				BEGIN
 					SET res = 'No existe el vuelo de vuelta en la base de datos';
+					COMMIT;
 					LEAVE SALIDA_PROCEDURE;
 				END;
 			END IF;
@@ -458,6 +463,7 @@ CREATE PROCEDURE realizar_reserva_ida_vuelta(IN id_vuelo_ida VARCHAR(45), IN fec
 			IF(row_count = 0) THEN
 				BEGIN
 					SET res = 'No existe la persona que desea realizar la reserva en la base de datos';
+					COMMIT;
 					LEAVE SALIDA_PROCEDURE;
 				END;
 			END IF;
@@ -466,6 +472,7 @@ CREATE PROCEDURE realizar_reserva_ida_vuelta(IN id_vuelo_ida VARCHAR(45), IN fec
 			IF(row_count = 0) THEN
 				BEGIN
 					SET res = 'No existe el empleado que debe atender la reserva en la base de datos';
+					COMMIT;
 					LEAVE SALIDA_PROCEDURE;
 				END;
 			END IF;
@@ -508,14 +515,14 @@ CREATE PROCEDURE realizar_reserva_ida_vuelta_aux(IN id_vuelo_ida VARCHAR(45), IN
 		SELECT cant_asientos INTO cant_asientos_vuelta FROM vuelos_disponibles WHERE vuelo = id_vuelo_vuelta AND fecha = fecha_vuelo_vuelta AND clase = clase_vuelo_vuelta LOCK IN SHARE MODE;
 	
 	
-		SET cant_reservados_ida = (SELECT count(*) FROM asientos_reservados WHERE vuelo = id_vuelo_ida AND fecha = fecha_vuelo_ida AND clase = clase_vuelo_ida);
+		SET cant_reservados_ida = (SELECT count(*) FROM asientos_reservados WHERE vuelo = id_vuelo_ida AND fecha = fecha_vuelo_ida AND clase = clase_vuelo_ida FOR UPDATE);
 		if(cant_reservados_ida = 0) THEN /*Caso que no este inicializada para no obtener un null*/
 			SET cant_reservados_ida = 0;
 		ELSE
 			SELECT cantidad INTO cant_reservados_ida FROM asientos_reservados WHERE vuelo = id_vuelo_ida AND fecha = fecha_vuelo_ida AND clase = clase_vuelo_ida FOR UPDATE;
 		END IF;
 		
-		SET cant_reservados_vuelta = (SELECT count(*) FROM asientos_reservados WHERE vuelo = id_vuelo_vuelta AND fecha = fecha_vuelo_vuelta AND clase = clase_vuelo_vuelta);
+		SET cant_reservados_vuelta = (SELECT count(*) FROM asientos_reservados WHERE vuelo = id_vuelo_vuelta AND fecha = fecha_vuelo_vuelta AND clase = clase_vuelo_vuelta FOR UPDATE);
 		if(cant_reservados_vuelta = 0) THEN /*Caso que no este inicializada para no obtener un null*/
 			SET cant_reservados_ida = 0;
 		ELSE
