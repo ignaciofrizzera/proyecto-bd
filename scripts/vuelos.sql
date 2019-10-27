@@ -294,7 +294,7 @@ CREATE VIEW vuelos_disponibles AS
 			cant_asientos,
 			aeropuerto_salida,
 			aeropuerto_llegada,
-			round(((cant_asientos + cant_asientos*porcentaje_clase) - count(numero_reserva)), 0) as cant_libres,
+			(round((cant_asientos + cant_asientos*porcentaje_clase), 0) - count(numero_reserva)) as cant_libres,
 			if (hora_llega > hora_sale, 
 				timediff(hora_llega,hora_sale), SEC_TO_TIME (TIME_TO_SEC(hora_llega) + TIME_TO_SEC(TIMEDIFF('24:00:00',hora_sale)))      
 			) as tiempo_estimado
@@ -305,7 +305,7 @@ CREATE VIEW vuelos_disponibles AS
 #	Creacion de usuarios y privilegios
 #
 
-
+/*
 CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';
 GRANT ALL PRIVILEGES ON vuelos.* TO 'admin'@'localhost' WITH GRANT OPTION;
 
@@ -318,7 +318,7 @@ GRANT DELETE, INSERT, UPDATE ON vuelos.reserva_vuelo_clase TO 'empleado'@'%';
 
 CREATE USER 'cliente'@'%' IDENTIFIED BY 'cliente';
 GRANT SELECT ON vuelos.vuelos_disponibles TO 'cliente'@'%';
-
+*/
 
 #
 #	Creacion de stored procedures
@@ -365,19 +365,13 @@ CREATE PROCEDURE realizar_reserva_ida(IN id_vuelo VARCHAR(45), IN fecha_vuelo DA
 				END;
 			END IF;
 		
-			SET row_count = (SELECT count(*) FROM asientos_reservados);
-			IF(row_count = 0) THEN
-				CALL realizar_reserva_ida_aux(id_vuelo, fecha_vuelo, clase_vuelo, id_vuelo, fecha_vuelo, clase_vuelo, tipo_doc, nro_doc, legajo_emp, res);
-			ELSE 
-			BEGIN	
-				SELECT cant_libres INTO cant_disponibles FROM vuelos_disponibles WHERE vuelo = id_vuelo AND fecha = fecha_vuelo AND clase = clase_vuelo LOCK IN SHARE MODE;
-				IF(cant_disponibles > 0) THEN
-					CALL realizar_reserva_ida_aux(id_vuelo, fecha_vuelo, clase_vuelo, tipo_doc, nro_doc, legajo_emp, res);
-				ELSE
-					SET res = 'No hay asientos disponibles para realizar la reserva';
-				END IF;
-			END;
+			SELECT cant_libres INTO cant_disponibles FROM vuelos_disponibles WHERE vuelo = id_vuelo AND fecha = fecha_vuelo AND clase = clase_vuelo LOCK IN SHARE MODE;
+			IF(cant_disponibles > 0) THEN
+				CALL realizar_reserva_ida_aux(id_vuelo, fecha_vuelo, clase_vuelo, tipo_doc, nro_doc, legajo_emp, res);
+			ELSE
+				SET res = 'No hay asientos disponibles para realizar la reserva';
 			END IF;
+			
 		COMMIT;
 	END;!
 	
@@ -476,23 +470,16 @@ CREATE PROCEDURE realizar_reserva_ida_vuelta(IN id_vuelo_ida VARCHAR(45), IN fec
 					LEAVE SALIDA_PROCEDURE;
 				END;
 			END IF;
-		
-			SET row_count = (SELECT count(*) FROM asientos_reservados);
-			IF(row_count = 0) THEN
+			
+			SELECT cant_libres INTO cant_disponibles_ida FROM vuelos_disponibles WHERE vuelo = id_vuelo_ida AND fecha = fecha_vuelo_ida AND clase = clase_vuelo_ida LOCK IN SHARE MODE;
+			SELECT cant_libres INTO cant_disponibles_vuelta FROM vuelos_disponibles WHERE vuelo = id_vuelo_vuelta AND fecha = fecha_vuelo_vuelta AND clase = clase_vuelo_vuelta LOCK IN SHARE MODE;
+			IF(cant_disponibles_ida > 0 AND cant_disponibles_vuelta > 0) THEN
 				CALL realizar_reserva_ida_vuelta_aux(id_vuelo_ida, fecha_vuelo_ida, clase_vuelo_ida, id_vuelo_vuelta, fecha_vuelo_vuelta, clase_vuelo_vuelta, tipo_doc,
 				nro_doc, legajo_emp, res);
-			ELSE 
-			BEGIN	
-				SELECT cant_libres INTO cant_disponibles_ida FROM vuelos_disponibles WHERE vuelo = id_vuelo_ida AND fecha = fecha_vuelo_ida AND clase = clase_vuelo_ida LOCK IN SHARE MODE;
-				SELECT cant_libres INTO cant_disponibles_vuelta FROM vuelos_disponibles WHERE vuelo = id_vuelo_vuelta AND fecha = fecha_vuelo_vuelta AND clase = clase_vuelo_vuelta LOCK IN SHARE MODE;
-				IF(cant_disponibles_ida > 0 AND cant_disponibles_vuelta > 0) THEN
-					CALL realizar_reserva_ida_vuelta_aux(id_vuelo_ida, fecha_vuelo_ida, clase_vuelo_ida, id_vuelo_vuelta, fecha_vuelo_vuelta, clase_vuelo_vuelta, tipo_doc,
-					nro_doc, legajo_emp, res);
-				ELSE
-					SET res = 'No hay asientos disponibles para realizar la reserva';
-				END IF;
-			END;
+			ELSE
+				SET res = 'No hay asientos disponibles para realizar la reserva';
 			END IF;
+			
 		COMMIT;
 	END;!
 
@@ -564,8 +551,9 @@ CREATE PROCEDURE realizar_reserva_ida_vuelta_aux(IN id_vuelo_ida VARCHAR(45), IN
 	END;!	
 DELIMITER ; # una vez creados los procedures se vuelve a establecer ; como delimitador
 
-
+/*
 GRANT EXECUTE ON PROCEDURE vuelos.realizar_reserva_ida TO 'empleado'@'%';
 GRANT EXECUTE ON PROCEDURE vuelos.realizar_reserva_ida_aux TO 'empleado'@'%';
 GRANT EXECUTE ON PROCEDURE vuelos.realizar_reserva_ida_vuelta TO 'empleado'@'%';
 GRANT EXECUTE ON PROCEDURE vuelos.realizar_reserva_ida_vuelta_aux TO 'empleado'@'%';
+*/
