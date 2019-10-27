@@ -18,3 +18,4 @@ out/production/proyecto-bd/main/resources/META-INF/MANIFEST.MF
 src/META-INF/MANIFEST.MF
 out/artifacts/proyecto_bd_jar/proyecto-bd.jar
 out/production/proyecto-bd/META-INF/MANIFEST.MF
+.idea/proyecto-bd.iml
