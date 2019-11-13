@@ -318,12 +318,12 @@ public class Logica {
      * @param fecha     fecha en la que es el vuelo
      * @return coleccion con la informacion de asientos disponibles, clases y precios del vuelo
      */
-    public Collection<Collection<String>> info_vuelo(int num_vuelo, Date fecha) throws SQLException {
+    public Collection<Collection<String>> info_vuelo(String num_vuelo, Date fecha) throws SQLException {
         Collection<Collection<String>> data = new LinkedList<>();
         Date fecha_sql = fechas.Fechas.convertirDateADateSQL(fecha);
         String query = "select clase, cant_libres as asientos_disponibles, precio" +
                 " from vuelos_disponibles" +
-                " where vuelo = " + num_vuelo + " and fecha = '" + fecha_sql + "'";
+                " where vuelo = '" + num_vuelo + "' and fecha = '" + fecha_sql + "'";
         data = this.ejecutar_query(query);
         return data;
     }

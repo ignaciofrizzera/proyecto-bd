@@ -14,24 +14,6 @@ BEGIN
 																			where selected_date between curdate() and date_add(curdate(), INTERVAL 1 YEAR))	 AS t2;															
 END
 !
-
-
-/*CREATE TRIGGER vuelos.trigger_asientos_reservados
-AFTER INSERT ON vuelos.brinda
-FOR EACH ROW
-BEGIN
-	DECLARE n INT;
-	DECLARE i INT;
-	SET n = (SELECT COUNT(*) FROM vuelos.instancias_vuelo AS t1 NATURAL JOIN vuelos.brinda AS t2 WHERE vuelo=NEW.vuelo AND dia=NEW.dia AND clase=NEW.clase);
-	SET i=0;
-	WHILE i<n DO 
-		INSERT INTO vuelos.asientos_reservados(vuelo, fecha, clase, cantidad)
-		SELECT vuelo, fecha, clase, 0 
-		FROM (SELECT * FROM vuelos.instancias_vuelo AS t1 NATURAL JOIN vuelos.brinda AS t2 WHERE vuelo=NEW.vuelo AND dia=NEW.dia AND clase=NEW.clase LIMIT i,1) v;
-		SET i = i + 1;
-	END WHILE;
-END
-!*/
 DELIMITER ;
 																	
 

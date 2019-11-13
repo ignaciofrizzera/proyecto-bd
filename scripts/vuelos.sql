@@ -305,7 +305,7 @@ CREATE VIEW vuelos_disponibles AS
 #	Creacion de usuarios y privilegios
 #
 
-/*
+
 CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';
 GRANT ALL PRIVILEGES ON vuelos.* TO 'admin'@'localhost' WITH GRANT OPTION;
 
@@ -318,7 +318,7 @@ GRANT DELETE, INSERT, UPDATE ON vuelos.reserva_vuelo_clase TO 'empleado'@'%';
 
 CREATE USER 'cliente'@'%' IDENTIFIED BY 'cliente';
 GRANT SELECT ON vuelos.vuelos_disponibles TO 'cliente'@'%';
-*/
+
 
 #
 #	Creacion de stored procedures
@@ -551,9 +551,8 @@ CREATE PROCEDURE realizar_reserva_ida_vuelta_aux(IN id_vuelo_ida VARCHAR(45), IN
 	END;!	
 DELIMITER ; # una vez creados los procedures se vuelve a establecer ; como delimitador
 
-/*
+
 GRANT EXECUTE ON PROCEDURE vuelos.realizar_reserva_ida TO 'empleado'@'%';
 GRANT EXECUTE ON PROCEDURE vuelos.realizar_reserva_ida_aux TO 'empleado'@'%';
 GRANT EXECUTE ON PROCEDURE vuelos.realizar_reserva_ida_vuelta TO 'empleado'@'%';
 GRANT EXECUTE ON PROCEDURE vuelos.realizar_reserva_ida_vuelta_aux TO 'empleado'@'%';
-*/

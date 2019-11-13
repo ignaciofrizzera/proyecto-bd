@@ -26,6 +26,7 @@ public class DialogReservarIda extends JDialog {
         this.logica = logica;
 
         setContentPane(contentPane);
+        setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 

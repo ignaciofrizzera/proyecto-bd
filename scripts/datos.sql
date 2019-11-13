@@ -52,36 +52,36 @@ INSERT INTO aeropuertos(codigo, nombre, telefono, direccion, pais, estado, ciuda
 
 
 #INSERCION EN VUELOS PROGRAMADOS
-INSERT INTO vuelos_programados(numero, aeropuerto_salida, aeropuerto_llegada) VALUES("0001", "LP001", "CP005");
-INSERT INTO vuelos_programados(numero, aeropuerto_salida, aeropuerto_llegada) VALUES("0002", "CP005", "LP001");
-INSERT INTO vuelos_programados(numero, aeropuerto_salida, aeropuerto_llegada) VALUES("0003", "A004", "MP003");
-INSERT INTO vuelos_programados(numero, aeropuerto_salida, aeropuerto_llegada) VALUES("0004", "BB002", "LP001");
-INSERT INTO vuelos_programados(numero, aeropuerto_salida, aeropuerto_llegada) VALUES("0005", "MP003", "LP001");
+INSERT INTO vuelos_programados(numero, aeropuerto_salida, aeropuerto_llegada) VALUES("A0001", "LP001", "CP005");
+INSERT INTO vuelos_programados(numero, aeropuerto_salida, aeropuerto_llegada) VALUES("A0002", "CP005", "LP001");
+INSERT INTO vuelos_programados(numero, aeropuerto_salida, aeropuerto_llegada) VALUES("A0003", "A004", "MP003");
+INSERT INTO vuelos_programados(numero, aeropuerto_salida, aeropuerto_llegada) VALUES("A0004", "BB002", "LP001");
+INSERT INTO vuelos_programados(numero, aeropuerto_salida, aeropuerto_llegada) VALUES("A0005", "MP003", "LP001");
 
 
 #INSERCION EN SALIDAS
-INSERT INTO salidas(vuelo, dia, hora_sale, hora_llega, modelo_avion) VALUES("0001", "Lu", '09:15', '12:45', "Boeing 0");
-INSERT INTO salidas(vuelo, dia, hora_sale, hora_llega, modelo_avion) VALUES("0002", "Do", '21:00', '06:30', "Boeing 1");
-INSERT INTO salidas(vuelo, dia, hora_sale, hora_llega, modelo_avion) VALUES("0003", "Ma", '14:20', '19:30', "Boeing 2");
-INSERT INTO salidas(vuelo, dia, hora_sale, hora_llega, modelo_avion) VALUES("0004", "Mi", '16:20', '22:45', "Boeing 3");
-INSERT INTO salidas(vuelo, dia, hora_sale, hora_llega, modelo_avion) VALUES("0005", "Vi", '05:35', '11:15', "Delta 0");
+INSERT INTO salidas(vuelo, dia, hora_sale, hora_llega, modelo_avion) VALUES("A0001", "Lu", '09:15', '12:45', "Boeing 0");
+INSERT INTO salidas(vuelo, dia, hora_sale, hora_llega, modelo_avion) VALUES("A0002", "Do", '21:00', '06:30', "Boeing 1");
+INSERT INTO salidas(vuelo, dia, hora_sale, hora_llega, modelo_avion) VALUES("A0003", "Ma", '14:20', '19:30', "Boeing 2");
+INSERT INTO salidas(vuelo, dia, hora_sale, hora_llega, modelo_avion) VALUES("A0004", "Mi", '16:20', '22:45', "Boeing 3");
+INSERT INTO salidas(vuelo, dia, hora_sale, hora_llega, modelo_avion) VALUES("A0005", "Vi", '05:35', '11:15', "Delta 0");
 
 
 #INSERCION EN INSTANCIAS VUELO
-INSERT INTO instancias_vuelo(vuelo, fecha, dia, estado) VALUES("0001", "2019/08/21", "Lu", "Cancelado");
-INSERT INTO instancias_vuelo(vuelo, fecha, dia, estado) VALUES("0002", "2019/11/07", "Do", "Demorado");
-INSERT INTO instancias_vuelo(vuelo, fecha, dia, estado) VALUES("0003", "2019/10/19", "Ma", "En horario");
-INSERT INTO instancias_vuelo(vuelo, fecha, dia, estado) VALUES("0004", "2019/12/31", "Mi", "Demorado");
-INSERT INTO instancias_vuelo(vuelo, fecha, dia, estado) VALUES("0005", "2020/02/01", "Vi", "En horario");
+INSERT INTO instancias_vuelo(vuelo, fecha, dia, estado) VALUES("A0001", "2019/08/21", "Lu", "Cancelado");
+INSERT INTO instancias_vuelo(vuelo, fecha, dia, estado) VALUES("A0002", "2019/11/07", "Do", "Demorado");
+INSERT INTO instancias_vuelo(vuelo, fecha, dia, estado) VALUES("A0003", "2019/10/19", "Ma", "En horario");
+INSERT INTO instancias_vuelo(vuelo, fecha, dia, estado) VALUES("A0004", "2019/12/31", "Mi", "Demorado");
+INSERT INTO instancias_vuelo(vuelo, fecha, dia, estado) VALUES("A0005", "2020/02/01", "Vi", "En horario");
 
 
 #INSERCION EN BRINDA
-INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0001", "Lu", "Economica", 8905.94, 100);
-INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0001", "Lu", "Media", 10000, 5);
-INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0002", "Do", "Primera Clase", 18905.94, 40);
-INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0003", "Ma", "Media", 12905.94, 70);
-INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0004", "Mi", "Super economica", 3905.94, 140);
-INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("0005", "Vi", "Intermedia", 6905.94, 75);
+INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("A0001", "Lu", "Economica", 8905.94, 100);
+INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("A0001", "Lu", "Media", 10000, 5);
+INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("A0002", "Do", "Primera Clase", 18905.94, 40);
+INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("A0003", "Ma", "Media", 12905.94, 70);
+INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("A0004", "Mi", "Super economica", 3905.94, 140);
+INSERT INTO brinda(vuelo, dia, clase, precio, cant_asientos) VALUES("A0005", "Vi", "Intermedia", 6905.94, 75);
 
 
 #INSERCION EN EMPLEADOS
@@ -110,10 +110,10 @@ INSERT INTO reservas(numero, fecha, vencimiento, estado, doc_tipo, doc_nro, lega
 
 
 #INSERCION EN RESERVA VUELO CLASE
-INSERT INTO reserva_vuelo_clase(numero, vuelo, fecha_vuelo, clase) VALUES(501, "0001", "2019/08/21", "Economica");
-INSERT INTO reserva_vuelo_clase(numero, vuelo, fecha_vuelo, clase) VALUES(502, "0001", "2019/08/21", "Economica");
-INSERT INTO reserva_vuelo_clase(numero, vuelo, fecha_vuelo, clase) VALUES(503, "0003", "2019/10/19", "Media");
-INSERT INTO reserva_vuelo_clase(numero, vuelo, fecha_vuelo, clase) VALUES(504, "0004", "2019/12/31", "Intermedia");
-INSERT INTO reserva_vuelo_clase(numero, vuelo, fecha_vuelo, clase) VALUES(505, "0005", "2020/02/01", "Economica");
-INSERT INTO reserva_vuelo_clase(numero, vuelo, fecha_vuelo, clase) VALUES(506, "0001", "2019/08/21", "Media");
+INSERT INTO reserva_vuelo_clase(numero, vuelo, fecha_vuelo, clase) VALUES(501, "A0001", "2019/08/21", "Economica");
+INSERT INTO reserva_vuelo_clase(numero, vuelo, fecha_vuelo, clase) VALUES(502, "A0001", "2019/08/21", "Economica");
+INSERT INTO reserva_vuelo_clase(numero, vuelo, fecha_vuelo, clase) VALUES(503, "A0003", "2019/10/19", "Media");
+INSERT INTO reserva_vuelo_clase(numero, vuelo, fecha_vuelo, clase) VALUES(504, "A0004", "2019/12/31", "Intermedia");
+INSERT INTO reserva_vuelo_clase(numero, vuelo, fecha_vuelo, clase) VALUES(505, "A0005", "2020/02/01", "Economica");
+INSERT INTO reserva_vuelo_clase(numero, vuelo, fecha_vuelo, clase) VALUES(506, "A0001", "2019/08/21", "Media");
 

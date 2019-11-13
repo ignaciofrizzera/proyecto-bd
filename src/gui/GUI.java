@@ -405,8 +405,7 @@ public class GUI {
         }
 
         public void mouseClicked(MouseEvent e) {
-            String stringVuelo = (String) myModel.getValueAt(myTable.getSelectedRow(), 0);
-            int vuelo = Integer.parseInt(stringVuelo);
+            String vuelo = (String) myModel.getValueAt(myTable.getSelectedRow(), 0);
 
             String datesString = (String) myModel.getValueAt(myTable.getSelectedRow(), myTable.getColumnCount() - 1);
             Date fecha = Fechas.convertirStringADate(datesString);
